@@ -1,0 +1,60 @@
+POST (login)
+    constant: username 
+    constant: hashedPassword
+
+    slect username and password
+
+    query_database with selected username and password:
+
+        handle error;
+        
+        handle user login success;
+        
+        handle username or password is wrong
+
+GET (dashboard):
+
+    constant: timeframe
+    constant: username  //could use a different identifier if needed
+
+    if timeframe == weekly:
+        
+        // PARALLELIZE IF POSSIBLE
+        exerciseresult = get weekly aggregates from the exercise table where username = username;
+        dietresult = get weekly aggregate from the diet table username = username;
+        personalresult = get weekly aggregates from personal table username = username;
+
+        return exerciseresult, dietresult, personalresult;
+    
+    else if timeframe == total:
+
+        //PARALLELIZE IF POSSIBLE
+        exerciseresult = get total aggregates from the exercise table username = username;
+        dietresult = get total aggregate from the diet table username = username;
+        personalresult = get total aggregates from personal table username = username;
+
+        return exerciseresult, dietresult, personalresult;
+
+POST (createUser):
+
+    constant: username
+    constant: hashedpassword
+    constant: email
+    constant: birthday
+
+    check_user = fetch uniqe fields (username and email) from users that match input
+    create_user = insert into table where ...
+
+    check_user_result = query database with check_user;
+
+    if err:
+        handle err;
+
+    else if result length > 0:
+        check unique fields (user name and password) for which is already in use (or all are used already) and return which need to be changed;
+    
+    else:
+        insert into database with create_user:
+            handle insert error or return success;
+
+    
