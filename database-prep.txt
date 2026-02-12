@@ -1,0 +1,38 @@
+﻿2/11/26
+Trello Cards Owned
+* Convert ERD into schema
+* Create tables and insert test data
+* Write queries 
+
+
+1. Convert ERD into schema:
+* Convert the image below into a schema
+  
+
+* Use erdplus.com
+   * Link: https://erdplus.com/diagrams
+   * Just create new schema
+* Look over what done means on the Trello board
+   * https://trello.com/b/88oOivUz/helath-alert
+
+
+2. Create tables and insert test data
+* Create tables using the schema 
+* Insert test data; making sure it works
+* Find a way to test that it works
+* Look over what done means on the Trello board
+   * https://trello.com/b/88oOivUz/helath-alert
+
+
+3. Write Queries 
+* Download database software
+* Write queries for all tables & data
+* Make sure it works with test data
+* Look over what done means on the Trello board
+   * https://trello.com/b/88oOivUz/helath-alert 
+
+
+4. Risks or Questions
+* Using the wrong database software
+   * Connect with Professor Burbatt about the right one for the project
+* Connect with teammates to see if data correlates with what they are working on
