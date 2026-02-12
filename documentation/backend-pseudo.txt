@@ -2,7 +2,7 @@ POST (login)
     constant: username 
     constant: hashedPassword
 
-    slect username and password
+    select username and password
 
     query_database with selected username and password:
 
