@@ -1,0 +1,12 @@
+RESPONSIBILITIES
+
+* Choose backend stack and initialize project
+
+* Create base server and test
+
+* Write setup guide for running backend
+
+Initialize the django and flask project
+Install all packages needed with pip 
+create a test route and run on the specified project
+create a detailed explaination on how to run the backend code
