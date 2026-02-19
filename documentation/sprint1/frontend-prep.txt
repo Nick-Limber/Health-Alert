@@ -31,3 +31,18 @@ Done is:
 • What you need from teammates
 I need to have clear, consistent communication with everyone
 involved in the frontend parts so there are no misunderstandings.
+1.  add navigation structure & add styling and basic interactivity
+2.  I need to add a bottom navigation bar for the home page, diet page, and exercise, skin/hair care page,
+    notification page, and the account page.
+    I need to style the pages.
+3.  I first need to create the different pages/screens for each tab
+    that I plan to add. for example the home page, diet page etc.
+    Then i need to add icons at the bottom of the screen for the mobile tabs.
+    and have them serve as links to navigate to the different pages I will create.
+    I will also have to style the pages such as changing background colors chaning font size, the size of the mobile tab icons so they all fit on the screen.
+    I expect to edit the wireframe page.
+    Done will look like a landing page where you will be able to click on any of the 
+    mobile tabs and where you will be able to navigate to whichever one you like.
+4.  What might block me is how I will create the frontend pages using android studio or through vscode. Im not 
+    entirely sure which to use.
+    I will need what type of data to display on each page from the database teammate.
