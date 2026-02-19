@@ -1,3 +1,36 @@
+1. What you are responsible for in Sprint 1
+• List the Trello cards you own
+I own the Build landing page layout, which includes the home-screen page
+and follows layout of wireframe. I am also sharing the Add styling and basic
+interactivity card with Porfirio.
+
+
+2. Setup steps
+• Step by step instructions for what you need to install, configure, or create
+• Include commands, links, or screenshots if needed
+I need to create a HTML file and a CSS file for the home page.
+We are using Andriod and Firebase.
+
+
+3. Development plan
+• Step by step plan for how you will build your cards this sprint
+• Include what files you expect to create or edit
+• Include what “done” looks like
+I will build my cards by following the wireframe for the homepage.
+I expect to have two files, one for HTML and one for CSS so far.
+Done will look like home-screen page that has consistent colors/images/pictures.
+Done is:
+• A working landing/home/default page
+• Visual structure that matches your wireframes
+• Initial styling choices applied
+• Some form of interactivity or JavaScript logic
+
+
+4. Risks or questions
+• What might block you
+• What you need from teammates
+I need to have clear, consistent communication with everyone
+involved in the frontend parts so there are no misunderstandings.
 1.  add navigation structure & add styling and basic interactivity
 2.  I need to add a bottom navigation bar for the home page, diet page, and exercise, skin/hair care page,
     notification page, and the account page.
