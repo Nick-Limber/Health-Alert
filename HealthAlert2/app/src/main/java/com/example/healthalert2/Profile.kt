@@ -17,7 +17,7 @@ class Profile : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.button.setOnClickListener {
-            Toast.makeText(this, "Button Clicked", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Log in Clicked", Toast.LENGTH_LONG).show()
         }
     }
 }
