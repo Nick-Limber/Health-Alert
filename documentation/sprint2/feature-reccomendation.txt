@@ -1,0 +1,14 @@
+Problem: I have a goal in mind however, just tracking my journey is not enough. How do I enhance my progress while tracking it.
+
+User Flow: User inputs the goals they want to achieve -> if not available user inpust previous data they have tracked -> User recieves a reccomendation -> They can grade how happy they are to report
+
+Features: 
+        In the UI add the a button to create a new plan
+        Based on the plan and data dispay the plan in an effective manner
+        The backend would have a route that take the type of plan and returns the re comendations
+        The databse would need a table to store the reccomendations and the exercises for a specific user
+        
+API:    Create new routes to access the data, display reccomendations, allow user to give feedback
+Database: Create a table to store the reccomendations that someone will receive
+
+Done: Be able to create a new user insert some data about themselves, insert previously tracked data, and have the reccomendation sbased on that data displayed. 
