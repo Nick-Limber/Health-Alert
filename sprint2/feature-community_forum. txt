@@ -1,0 +1,33 @@
+1.	Problem Statement: What problem does this solve?
+Users may want to share health advice with each other, so this feature allows different users to post advice for others to read.
+
+
+2.	User Flow: Step by step from start to finish
+User logs into Health Alert.
+User navigates to the Community Forum page.
+The user can see exisiting posts or click "Create post" to create their own post.
+The user will submit the post and it will be saved to the database.
+The user will be redirected back to the forum page and will see their post appear in the list.
+
+
+3.	Technical Plan (Frontend changes, Backend routes, Database changes, Files expected to be created or modified)
+Frontend Changes - Make a page for the community forum where users can make posts and see other people's posts.
+Files to create: .xml
+Backend Changes - Must support creating posts and retrieiving posts.
+Database Changes - Must store the posts users make, so will make a table for posts.
+
+
+4.	API Changes (New routes, Modified routes, Request and response structure)
+  1. Create Post
+  request the userId, title, and the content
+  response: "Post created successfully"
+  2. Get All Posts
+  response: postId, userId, title, the content, timestamp
+
+
+5.	Database Changes (New tables, Schema updates, New fields)
+New table: Posts
+postId, userId, title, content, timestamp
+
+6.	Acceptance Criteria (Clear definition of done, Must be testable)
+Users are able to navigate to forum, create posts to the community forum, and read through the forum.
