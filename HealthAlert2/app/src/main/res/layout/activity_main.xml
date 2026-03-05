@@ -8,7 +8,6 @@
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
-
     <ImageView
         android:id="@+id/myImage"
         android:layout_width="372dp"
@@ -23,22 +22,22 @@
         app:layout_constraintVertical_bias="0.109" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/loginbutton"
         android:layout_width="163dp"
         android:layout_height="62dp"
+        android:background="@drawable/login_button_selector"
         android:text="Log in"
         android:textColor="#FAFAFA"
-        android:background="@drawable/login_button_selector"
         app:backgroundTint="@null"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button2"
-        app:layout_constraintHorizontal_bias="0.614"
+        app:layout_constraintEnd_toStartOf="@+id/joinnowbutton"
+        app:layout_constraintHorizontal_bias="0.235"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.765" />
+        app:layout_constraintVertical_bias="0.764" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/joinnowbutton"
         android:layout_width="163dp"
         android:layout_height="62dp"
         android:background="@drawable/join_button_background"
