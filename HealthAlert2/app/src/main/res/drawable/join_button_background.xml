@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- When Pressed state -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#1E4E87"/>   <!-- Dark Blue -->
+            <stroke android:width="2dp"
+                android:color="#26A69A"/>      <!-- Teal border -->
+            <corners android:radius="26dp"/>
+        </shape>
+    </item>
+
+    <!-- Default -->
+    <item>
+     <shape android:shape="rectangle">
+         <solid android:color="#FAFAFA"/>   <!-- White fill of button -->
+            <stroke android:width="2dp"
+                android:color="#26A69A"/>      <!-- Teal border -->
+            <corners android:radius="26dp"/>
+        </shape>
+    </item>
+
+</selector>

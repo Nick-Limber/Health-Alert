@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/etTitle"
+        android:layout_width="381dp"
+        android:layout_height="120dp"
+        android:hint="Post Title"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/etContent"
+        android:layout_width="373dp"
+        android:layout_height="649dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:gravity="top"
+        android:hint="What's on your mind?"
+        />
+
+    <Button
+        android:id="@+id/btnSubmitPost"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/login_button_selector"
+        app:backgroundTint="@null"
+        android:text="Submit Post"
+        android:textColor="#FAFAFA"
+        />
+
+</LinearLayout>
