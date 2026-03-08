@@ -8,6 +8,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.widget.Toast
 
 class CommunityForumActivity : AppCompatActivity() {
 
@@ -35,6 +37,7 @@ class CommunityForumActivity : AppCompatActivity() {
         }
     }
 
+//TEMPORARY COMMUNITY FORUM POSTS
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_community_forum)
@@ -54,6 +57,33 @@ class CommunityForumActivity : AppCompatActivity() {
         btnCreatePost.setOnClickListener {
             val intent = Intent(this, CreatePostActivity::class.java)
             createPostLauncher.launch(intent)
+        }
+
+//NAVBAR SECTION
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+
+        bottomNav.selectedItemId = R.id.nav_forum
+
+        bottomNav.setOnItemSelectedListener {
+            when (it.itemId) {
+
+                R.id.nav_home -> {
+                    val intent = Intent(this, HomePage::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                R.id.nav_forum -> {
+                    true // already on community forum page
+                }
+
+                R.id.nav_account -> {
+                    Toast.makeText(this, "Account Selected", Toast.LENGTH_SHORT).show()
+                    true
+                }
+
+                else -> false
+            }
         }
     }
 }

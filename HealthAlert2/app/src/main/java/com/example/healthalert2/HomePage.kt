@@ -1,10 +1,8 @@
 package com.example.healthalert2
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.widget.Toast
 
@@ -23,7 +21,8 @@ class HomePage : AppCompatActivity() {
                 }
 
                 R.id.nav_forum -> {
-                    Toast.makeText(this, "Forum Selected", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, CommunityForumActivity::class.java)
+                    startActivity(intent)
                     true
                 }
 
