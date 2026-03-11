@@ -22,6 +22,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.buttonViewPastData.setOnClickListener {
+            val intent = Intent(this, ViewPastDataActivity::class.java)
+            startActivity(intent)
+        }
+
         binding.joinnowbutton.setOnClickListener {
             Toast.makeText(this, "Join Now Clicked", Toast.LENGTH_LONG).show()
         }
