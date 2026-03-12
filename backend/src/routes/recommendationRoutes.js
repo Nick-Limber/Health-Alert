@@ -1,4 +1,8 @@
 import express from "express";
-import { } from "../controllers/recommendationController.js";
+import { generate } from "../controllers/recommendationController.js";
 
 const router = express.Router();
+
+router.post("/generate", generate);
+
+export default router;
