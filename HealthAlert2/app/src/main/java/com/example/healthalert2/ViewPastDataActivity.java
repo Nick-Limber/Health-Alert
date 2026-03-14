@@ -6,7 +6,21 @@ import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class ViewPastDataActivity extends AppCompatActivity
 {
@@ -26,6 +40,7 @@ public class ViewPastDataActivity extends AppCompatActivity
         nutritionList = findViewById(R.id.nutritionList);
         workoutList = findViewById(R.id.workoutList);
 
+        //ALL SAMPLE DATA
         graph.setData(Arrays.asList(180f, 178f, 176f, 175f));
 
         //sample data - weight
@@ -54,6 +69,74 @@ public class ViewPastDataActivity extends AppCompatActivity
                 "Shoulder Press - 8x8 - 185 lbs"
         };
         workoutList.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, sampleWorkout));
+
+        //Fetch live data
+        fetchData();
+    }
+
+    private void fetchData(){
+        OkHttpClient client = new OkHttpClient();
+        String url = "http://10.0.2.2:5001/health/pastdata";
+
+        Request request = new Request.Builder().url(url).build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+                    public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+            @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseBody = response.body().string();
+
+                    try {
+                         JSONArray dataArray = new JSONArray(responseBody);
+
+                         List<String> weightData = new ArrayList<>();
+                         List<Float> weightDataGraph = new ArrayList<>();
+                         List<String> nutritionData = new ArrayList<>();
+                         List<String> workoutData = new ArrayList<>();
+
+                         for (int i = 0; i < dataArray.length(); i++) {
+                             JSONObject entry = dataArray.getJSONObject(i);
+
+                             String date = entry.getString("date");
+
+                             //weight
+                             int weight = entry.optInt("weight", 0);
+                             weightData.add(date + " - " + weight + " lbs");
+                             if (weight != 0) {
+                                 weightDataGraph.add((float) weight);
+                             }
+
+                             //nutrition
+                             int calories = entry.optInt("calories", 0);
+                             int protein = entry.optInt("protein", 0);
+                             int carbs = entry.optInt("carbs", 0);
+                             nutritionData.add(date + " - " + calories + " calories / " + protein + "g protein / " + carbs + "g carbs");
+
+                             //exercise
+                             String exercise = entry.optString("exercise", "");
+                             String sets = entry.optString("sets", "");
+                             String reps = entry.optString("reps", "");
+                             String exWeight = entry.optString("weight", "");
+                             workoutData.add(exercise + " - " + sets + "x" + reps + " - " + exWeight);
+                         }
+
+                         runOnUiThread(() -> {
+                             weightList.setAdapter(new ArrayAdapter<>(ViewPastDataActivity.this, android.R.layout.simple_list_item_1, weightData));
+                             nutritionList.setAdapter(new ArrayAdapter<>(ViewPastDataActivity.this, android.R.layout.simple_list_item_1, nutritionData));
+                             workoutList.setAdapter(new ArrayAdapter<>(ViewPastDataActivity.this, android.R.layout.simple_list_item_1, workoutData));
+                             graph.setData(weightDataGraph);
+                         });
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
     }
 
 }

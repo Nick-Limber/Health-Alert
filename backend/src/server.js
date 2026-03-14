@@ -1,4 +1,5 @@
 import express from "express";
+import healthRoutes from "./routes/healthRoutes.js";
 import { config } from "dotenv";
 import { close_pool, db_pool } from "./config/db.js";
 
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // API ROUTES
 app.use("/authentication", authenticationRoutes);
+app.use("/health", healthRoutes);
 
 
 app.listen(PORT, () => {
