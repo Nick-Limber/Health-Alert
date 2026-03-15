@@ -154,6 +154,52 @@ const generate = async (req, res) => {
     }
 }
 
-export { generate };
+const getPlans = async (req, res) => {
+    const profile_id = parseInt(req.query.profile_id);
+
+    try {
+        const sql = `
+            SELECT p.workout_name, p.goal, d.day_number, d.day_id, 
+                   el.exercise_name, el.muscle_target, ex.exercise_order
+            FROM workout_plans p
+            JOIN workout_days d ON p.plan_id = d.plan_id
+            JOIN day_exercises ex ON d.day_id = ex.day_id
+            JOIN exercise_list el ON e.exercise_id = el.exercise_id
+            WHERE p.profile_id = ? AND p.active = 1
+            ORDER BY d.day_number, e.exercise_order`;
+
+        const [rows] = await db_pool.execute(sql, [profile_id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "No active plan found" });
+        }
+
+        const plan = {
+            workout_name: rows[0].workout_name,
+            goal: rows[0].goal,
+            days: []
+        };
+
+        rows.forEach(row => {
+            let day = plan.days.find(d => d.day_number === row.day_number);
+            if (!day) {
+                day = { day_number: row.day_number, exercises: [] };
+                plan.days.push(day);
+            }
+            day.exercises.push({
+                name: row.exercise_name,
+                target: row.muscle_target,
+                order: row.exercise_order
+            });
+        });
+
+        res.status(200).json(plan);
+
+    } catch (error) {
+        res.status(500).json({ error: `${error}` });
+    }
+};
+
+export { generate, getPlans };
 
 
