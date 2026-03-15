@@ -70,7 +70,6 @@ const generate = async (req, res) => {
                         candidates = pool.filter(row => row.muscle_target === slot && !usedIds.has(row.exercise_id));
                     }
 
-                    // Safety fallback: if candidates is empty, use the whole pool
                     const selection = randomExercise(candidates.length ? candidates : pool);
 
                     if (selection) {
