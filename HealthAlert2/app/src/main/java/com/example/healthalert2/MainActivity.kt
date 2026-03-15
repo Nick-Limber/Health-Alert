@@ -1,20 +1,18 @@
 package com.example.healthalert2
 
+import android.content.Intent
+import android.media.Image
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuItem
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.healthalert2.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,8 +20,21 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.button.setOnClickListener {
-            Toast.makeText(this, "Button Clicked",Toast.LENGTH_LONG).show()
+        binding.loginbutton.setOnClickListener {
+            // Navigate to CommunityForumActivity for now
+            val intent = Intent(this, LoginPage::class.java)
+            startActivity(intent)
+        }
+
+        binding.joinnowbutton.setOnClickListener {
+            Toast.makeText(this, "Join Now Clicked", Toast.LENGTH_LONG).show()
+
+        }
+
+        binding.closeButton.setOnClickListener {
+            val intent = Intent(this, HomePage::class.java)
+            startActivity(intent)
+            finish()
         }
 
     }
