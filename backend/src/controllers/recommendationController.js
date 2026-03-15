@@ -164,9 +164,9 @@ const getPlans = async (req, res) => {
             FROM workout_plans p
             JOIN workout_days d ON p.plan_id = d.plan_id
             JOIN day_exercises ex ON d.day_id = ex.day_id
-            JOIN exercise_list el ON e.exercise_id = el.exercise_id
+            JOIN exercise_list el ON ex.exercise_id = el.exercise_id
             WHERE p.profile_id = ? AND p.active = 1
-            ORDER BY d.day_number, e.exercise_order`;
+            ORDER BY d.day_number, ex.exercise_order`;
 
         const [rows] = await db_pool.execute(sql, [profile_id]);
 
