@@ -1,2 +1,5 @@
+.idea/
+.DS_Store
+*.env
 /.idea/390 Project.iml
 /.idea/
