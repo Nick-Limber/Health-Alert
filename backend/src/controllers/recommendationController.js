@@ -2,14 +2,13 @@ import { db_pool } from "../config/db.js";
 import { randomExercise } from "../utils/reccomendHelper.js"
 
 const generate = async (req, res) => {
-
     const { profile_id, height, weight, age, goal, muscle, level, access, workout_name } = req.body;
 
     // CHECK HOW MANY ACTIVE RECCOMENDATIONS USER HAS
     const active_sql = "SELECT * FROM workout_plans WHERE profile_id = ? AND active = ?";
     const [rows] = await db_pool.execute(active_sql, [profile_id, true]);
 
-    if (rows.length < 2) {
+    if (rows.length < 10) {
 
         let bmi = (weight / (height ** 2)) * 703;
         const bmi_threshold = 25.0;
