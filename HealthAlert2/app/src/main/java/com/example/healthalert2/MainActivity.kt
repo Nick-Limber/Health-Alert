@@ -2,6 +2,7 @@ package com.example.healthalert2
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.healthalert2.databinding.ActivityMainBinding
@@ -22,7 +23,8 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        binding.buttonViewPastData.setOnClickListener {
+        val viewPastDataButton = findViewById<Button>(R.id.viewPastDataButton)
+        viewPastDataButton.setOnClickListener {
             val intent = Intent(this, ViewPastDataActivity::class.java)
             startActivity(intent)
         }
