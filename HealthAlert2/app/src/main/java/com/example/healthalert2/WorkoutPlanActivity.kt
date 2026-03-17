@@ -28,7 +28,6 @@ class WorkoutPlanActivity : AppCompatActivity() {
         val mainView = findViewById<View>(R.id.main)
         ViewCompat.setOnApplyWindowInsetsListener(mainView) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            // This applies padding so the FAB and RecyclerView clear the navigation bar
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
@@ -55,11 +54,5 @@ class WorkoutPlanActivity : AppCompatActivity() {
             bottomSheet.show(supportFragmentManager, "GeneratePlanSheet")
         }
 
-        val testGoal = intent.getStringExtra("test_goal")
-        if (!testGoal.isNullOrEmpty()) {
-            // Here you would construct your request object and call the VM
-            // val testRequest = WorkoutRequest(goal = testGoal, bmi = 25.0f)
-            // viewModel.generateNewPlan(testRequest)
-        }
     }
 }
