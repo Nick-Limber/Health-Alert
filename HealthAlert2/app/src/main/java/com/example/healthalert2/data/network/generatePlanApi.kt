@@ -5,7 +5,7 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 interface ApiService {
 
-    @POST("/recommendation/generate") // Replace with your actual endpoint path
+    @POST("/recommendation/generate")
     suspend fun generateWorkoutPlan(
         @Body request: GeneratePlanRequest
     ): Response<GeneratePlanResponse>

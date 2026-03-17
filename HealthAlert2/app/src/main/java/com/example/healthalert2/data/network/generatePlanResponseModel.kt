@@ -14,7 +14,7 @@ data class PlanInfo(
     val level: String
 )
 data class WorkoutDay(
-    val day_number: Int, // Match the JSON exactly
+    val day_number: Int,
     val exercises: List<Exercise>
 )
 data class Exercise(

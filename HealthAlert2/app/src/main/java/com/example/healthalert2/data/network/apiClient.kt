@@ -8,8 +8,7 @@ import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    // Replace this with your actual server URL (must end in a slash /)
-    private const val BASE_URL = "http://localhost:5001/"
+    private const val BASE_URL = "http://10.0.2.2:5001/"
 
     private val moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
