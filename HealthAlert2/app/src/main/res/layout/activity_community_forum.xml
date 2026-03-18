@@ -8,6 +8,17 @@
     android:padding="16dp">
 
     <!-- RecyclerView to display posts -->
+    <Button
+        android:id="@+id/viewPastDataButton"
+        android:layout_width="136dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="44dp"
+        android:background="@drawable/login_button_selector"
+        android:text="View Past Data"
+        android:textColor="#FAFAFA"
+        android:backgroundTint="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btnCreatePost"

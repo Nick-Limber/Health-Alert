@@ -15,8 +15,7 @@
             android:name=".MainActivity2"
             android:exported="false" />
         <activity
-            android:name=".ViewPastDataActivity"
-            android:exported="true" />
+            android:name=".ViewPastDataActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

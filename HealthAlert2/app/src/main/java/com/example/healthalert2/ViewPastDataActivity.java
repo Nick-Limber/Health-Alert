@@ -26,7 +26,7 @@ public class ViewPastDataActivity extends AppCompatActivity {
     private ListView nutritionList;
     private ListView workoutList;
 
-    private OkHttpClient client = new OkHttpClient(); // HTTP client
+    //private OkHttpClient client = new OkHttpClient(); // HTTP client
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +38,52 @@ public class ViewPastDataActivity extends AppCompatActivity {
         nutritionList = findViewById(R.id.nutritionList);
         workoutList = findViewById(R.id.workoutList);
 
-        fetchPastDataFromBackend();
+        //temp data
+        showSampleData();
+        //fetchPastDataFromBackend();
     }
 
-    private void fetchPastDataFromBackend() {
+    private void showSampleData()
+    {
+        //sample weight
+        List<Float> weightValues = new ArrayList<>();
+        List<String> weightTimeStamps = new ArrayList<>();
+        List<String> weightLabels = new ArrayList<>();
+
+        weightValues.add(200f);
+        weightValues.add(190f);
+        weightValues.add(187f);
+
+        weightTimeStamps.add("2026-03-01 10:30:33");
+        weightTimeStamps.add("2026-03-02 11:12:55");
+        weightTimeStamps.add("2026-03-03 09:50:27");
+
+        weightLabels.add("March 1");
+        weightLabels.add("March 2");
+        weightLabels.add("March 3");
+
+        graph.setData(weightValues, weightTimeStamps);
+
+        //nutritionn
+        List<String> nutritionString = new ArrayList<>();
+        nutritionString.add("March 1 - Keto - 2500 cals - 100g protein - 0g carbs");
+        nutritionString.add("March 2 - Low Cal - 1500 cals - 90g protein - 70g carbs");
+
+        nutritionList.setAdapter(new ArrayAdapter<>(
+                this, android.R.layout.simple_list_item_1, nutritionString
+        ));
+
+        //exercise
+        List<String> workoutStrings = new ArrayList<>();
+        workoutStrings.add("Bench Press - 5x5 - 225 lbs");
+        workoutStrings.add("Squat - 3x8 - 175 lbs");
+
+        workoutList.setAdapter(new ArrayAdapter<>(
+                this, android.R.layout.simple_list_item_1,workoutStrings
+        ));
+    }
+
+    /*private void fetchPastDataFromBackend() {
         String url = "http://10.0.2.2:5001/health/pastdata"; //backend endpoint
 
         Request request = new Request.Builder().url(url).build();
@@ -138,5 +180,5 @@ public class ViewPastDataActivity extends AppCompatActivity {
                 }
             }
         });
-    }
+    }*/
 }
