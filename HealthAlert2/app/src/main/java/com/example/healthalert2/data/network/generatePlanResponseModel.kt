@@ -1,28 +1,31 @@
 package com.example.healthalert2.data.network
 
 import com.squareup.moshi.Json
-data class GeneratePlanResponse(
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
+data class WorkoutResponse(
     val success: Boolean,
-    val data: WorkoutData
+    val data: List<WorkoutPlan>
 )
-data class WorkoutData(
-    val plan: PlanInfo,
-    val days: List<WorkoutDay>
-)
-data class PlanInfo(
+
+@JsonClass(generateAdapter = true)
+data class WorkoutPlan(
+    @Json(name = "plan_id") val planId: Int,
+    @Json(name = "workout_name") val workoutName: String,
     val goal: String,
-    val level: String
+    val days: List<WorkoutDay> // Nested list of days
 )
+
+@JsonClass(generateAdapter = true)
 data class WorkoutDay(
-    val day_number: Int,
-    val exercises: List<Exercise>
+    @Json(name = "day_number") val dayNumber: Int,
+    val exercises: List<WorkoutExercise>
 )
-data class Exercise(
-    @Json(name = "exercise_id")
-    val exerciseId: Int?,
-    @Json(name = "exercise_name")
-    val exerciseName: String?,
-    @Json(name = "muscle_target")
-    val muscleTarget: String?,
-    val category: String?
+
+@JsonClass(generateAdapter = true)
+data class WorkoutExercise(
+    val name: String,
+    val target: String,
+    val order: Int
 )
