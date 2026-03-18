@@ -5,9 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.healthalert2.data.network.Exercise
+import com.example.healthalert2.data.network.WorkoutExercise
 
-class ExerciseAdapter(private val exercises: List<Exercise>) :
+class ExerciseAdapter(private val exercises: List<WorkoutExercise>) :
     RecyclerView.Adapter<ExerciseAdapter.ExerciseViewHolder>() {
 
     class ExerciseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -24,9 +24,11 @@ class ExerciseAdapter(private val exercises: List<Exercise>) :
 
     override fun onBindViewHolder(holder: ExerciseViewHolder, position: Int) {
         val exercise = exercises[position]
-        holder.name.text = exercise.exerciseName ?: "Unknown Exercise"
-        holder.muscle.text = "Target: ${exercise.muscleTarget ?: "General"}"
-        holder.category.text = exercise.category ?: "Fitness"
+
+        holder.name.text = exercise.name ?: "Unknown Exercise"
+        holder.muscle.text = "Target: ${exercise.target ?: "General"}"
+
+        holder.category.text = "Order: ${exercise.order}"
     }
 
     override fun getItemCount() = exercises.size

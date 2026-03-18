@@ -4,10 +4,10 @@ import { generateToken } from "../utils/generateToken.js";
 
 const register = async (req, res) => {
 
-    const { username, email, password } = req.body;
+    const { username, email, d_o_b, password } = req.body;
 
     try {
-        const [rows] = await (db_pool.execute("SELECT username, email FROM user WHERE username = ? OR email = ?", [username, email]));
+        const [rows] = await (db_pool.execute("SELECT username, email FROM profile WHERE username = ? OR email = ?", [username, email]));
 
         if (rows.length > 0) {
 
@@ -27,7 +27,7 @@ const register = async (req, res) => {
 
         const hashedpassword = await argon2.hash(password);
 
-        const [result] = await db_pool.execute("INSERT INTO user (username, email, password) VALUES (?, ?, ?)", [username, email, hashedpassword]);
+        const [result] = await db_pool.execute("INSERT INTO profile (username, email, d_o_b, password) VALUES (?, ?, ?,?)", [username, email, d_o_b, hashedpassword]);
 
         const token = generateToken(result.insertID);
 
@@ -55,13 +55,14 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const login_SQL = "SELECT userID, password FROM user WHERE email = ? LIMIT 1";
+        const login_SQL = "SELECT profile_id, password FROM profile WHERE email = ? LIMIT 1";
         const [rows] = await db_pool.execute(login_SQL, [email]);
 
         if (!rows || rows.length === 0) {
             return res.status(401).json({ error: "invalid email or password" });
         }
 
+        // Returns a boolean (True if the passwords match ---- False if the passwords don't)
         const validPassword = await argon2.verify(rows[0].password, password);
 
         if (!validPassword) {

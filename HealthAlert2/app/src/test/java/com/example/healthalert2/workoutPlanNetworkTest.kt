@@ -23,7 +23,7 @@ class WorkoutNetworkTest {
             workout_name = "none"
         )
 
-        val response = RetrofitClient.apiService.generateWorkoutPlan(request)
+        val response = RetrofitClient.generatePlanApiService.generateWorkoutPlan(request)
 
         println("Response Code: ${response.code()}")
 
@@ -35,14 +35,14 @@ class WorkoutNetworkTest {
             assertEquals(true, body?.success)
 
             println("\n=== GENERATED WORKOUT PLAN ===")
-            println("Goal: ${body?.data?.plan?.goal}")
-            println("Level: ${body?.data?.plan?.level}")
+            println("Workout Name: ${body?.data?.workoutName}")
+            println("Goal: ${body?.data?.goal}")
 
             body?.data?.days?.forEach { day ->
-                println("\nDay ${day.day_number}:")
+                println("\nDay ${day.dayNumber}:")
                 day.exercises.forEach { exercise ->
-                    println("  - ${exercise.exerciseName} [ID: ${exercise.exerciseId}]")
-                    println("    Target: ${exercise.muscleTarget} | Category: ${exercise.category}")
+                    println("  - ${exercise.name} [Order: ${exercise.order}]")
+                    println("    Target: ${exercise.target}")
                 }
             }
             println("\n===============================")
@@ -50,6 +50,23 @@ class WorkoutNetworkTest {
         } else {
             println("Error Body: ${response.errorBody()?.string()}")
             fail("API call failed with code: ${response.code()}")
+        }
+    }
+
+    @Test
+    fun testFetchActivePlans() = runBlocking {
+        // Test for retrieving existing plans
+        val response = RetrofitClient.generatePlanApiService.fetchWorkoutPlan(3)
+
+        println("Fetch Response Code: ${response.code()}")
+
+        if (response.isSuccessful) {
+            val body = response.body()
+            assertNotNull(body)
+            assertEquals(true, body?.success)
+            println("Successfully retrieved plan: ${body?.data?.workoutName}")
+        } else {
+            fail("Fetch API call failed")
         }
     }
 }

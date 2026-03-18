@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.healthalert2.R
 import com.example.healthalert2.data.network.WorkoutDay
 
-class DayAdapter(private val days: List<WorkoutDay>) :
+// Changed 'val' to 'var' so we can update the list later
+class DayAdapter(private var days: List<WorkoutDay>) :
     RecyclerView.Adapter<DayAdapter.DayViewHolder>() {
 
     class DayViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -18,22 +18,22 @@ class DayAdapter(private val days: List<WorkoutDay>) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.exercise_day, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.exercise_day, parent, false)
         return DayViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
-        val currentDay = days[position]
+        val day = days[position]
+        holder.tvDayNumber.text = "Day ${day.dayNumber}"
 
-        holder.tvDayNumber.text = "Day ${currentDay.day_number}"
-
-        val exerciseAdapter = ExerciseAdapter(currentDay.exercises)
+        val exerciseAdapter = ExerciseAdapter(day.exercises)
         holder.rvExercises.layoutManager = LinearLayoutManager(holder.itemView.context)
         holder.rvExercises.adapter = exerciseAdapter
-
-        holder.rvExercises.isNestedScrollingEnabled = false
+    }
+    fun updateData(newDays: List<WorkoutDay>) {
+        this.days = newDays
+        notifyDataSetChanged() // This is the magic line that refreshes the screen
     }
 
     override fun getItemCount() = days.size
-}
+    }

@@ -1,6 +1,7 @@
 package com.example.healthalert2
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -9,19 +10,17 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.healthalert2.DayAdapter
-import com.example.healthalert2.GeneratePlanBottomSheet
-import com.example.healthalert2.WorkoutViewModel
+import com.example.healthalert2.data.network.RetrofitClient
+import com.example.healthalert2.data.repository.GenerateWorkoutRepository
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class WorkoutPlanActivity : AppCompatActivity() {
 
     private lateinit var viewModel: WorkoutViewModel
-    private lateinit var dayAdapter: DayAdapter
+    private lateinit var planAdapter: PlanAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
         setContentView(R.layout.activity_workout_plan)
 
@@ -32,18 +31,28 @@ class WorkoutPlanActivity : AppCompatActivity() {
             insets
         }
 
-        viewModel = ViewModelProvider(this)[WorkoutViewModel::class.java]
+        val apiService = RetrofitClient.generatePlanApiService
+        val repository = GenerateWorkoutRepository(apiService)
+        val factory = WorkoutViewModelFactory(repository)
+        viewModel = ViewModelProvider(this, factory)[WorkoutViewModel::class.java]
 
         val recyclerView = findViewById<RecyclerView>(R.id.rvMainDays)
         recyclerView.layoutManager = LinearLayoutManager(this)
+        planAdapter = PlanAdapter(emptyList())
+        recyclerView.adapter = planAdapter
 
-        dayAdapter = DayAdapter(emptyList())
-        recyclerView.adapter = dayAdapter
+        viewModel.activePlansResult.observe(this) { response ->
+            response?.let {
+                planAdapter.updateData(it.data)
+                Log.d("API_DEBUG", "Fetched ${it.data.size} plans")
+            }
+        }
 
         viewModel.workoutPlanResult.observe(this) { response ->
             response?.let {
-                dayAdapter = DayAdapter(it.data.days)
-                recyclerView.adapter = dayAdapter
+                planAdapter.updateData(it.data)
+                Log.d("API_DEBUG", "Generated ${it.data.size} plans")
+
             }
         }
 
@@ -54,5 +63,6 @@ class WorkoutPlanActivity : AppCompatActivity() {
             bottomSheet.show(supportFragmentManager, "GeneratePlanSheet")
         }
 
+        viewModel.fetchPlans(4)
     }
 }

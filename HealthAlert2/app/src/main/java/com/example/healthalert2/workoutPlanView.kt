@@ -3,49 +3,68 @@ package com.example.healthalert2
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.healthalert2.data.network.GeneratePlanRequest
-import com.example.healthalert2.data.network.GeneratePlanResponse
-import com.example.healthalert2.data.network.RetrofitClient
+import com.example.healthalert2.data.network.WorkoutResponse
+import com.example.healthalert2.data.repository.GenerateWorkoutRepository
 import kotlinx.coroutines.launch
 
-class WorkoutViewModel : ViewModel() {
+class WorkoutViewModel(private val repository: GenerateWorkoutRepository) : ViewModel() {
 
-    val workoutPlanResult = MutableLiveData<GeneratePlanResponse?>()
-    val isLoading = MutableLiveData<Boolean>()
+    val workoutPlanResult = MutableLiveData<WorkoutResponse?>()
+    val activePlansResult = MutableLiveData<WorkoutResponse?>()
+    val isLoading = MutableLiveData<Boolean>(false)
     val errorMessage = MutableLiveData<String?>()
 
     fun generateNewPlan(request: GeneratePlanRequest) {
         viewModelScope.launch {
-            isLoading.postValue(true)
-            errorMessage.postValue(null)
-
-            Log.d("API_DEBUG", "Sending Request: $request")
+            isLoading.value = true
+            errorMessage.value = null
 
             try {
-                val response = RetrofitClient.apiService.generateWorkoutPlan(request)
-
+                val response = repository.getWorkoutPlan(request)
                 if (response.isSuccessful) {
-                    val body = response.body()
-                    Log.d("API_DEBUG", "Success! Received: $body")
-
-                    if (body?.data?.days.isNullOrEmpty()) {
-                        Log.w("API_DEBUG", "Warning: Response successful but 'days' list is empty!")
-                    }
-
-                    workoutPlanResult.postValue(body)
+                    workoutPlanResult.value = response.body()
+                    Log.d("API_DEBUG", "Generated successfully")
                 } else {
-                    val errorBody = response.errorBody()?.string()
-                    val errorLog = "Error Code: ${response.code()} | Body: $errorBody"
-                    Log.e("API_DEBUG", errorLog)
-                    errorMessage.postValue(errorLog)
+                    errorMessage.value = "Server Error: ${response.code()}"
                 }
             } catch (e: Exception) {
-                Log.e("API_DEBUG", "Network Failure: ${e.message}", e)
-                errorMessage.postValue("Network Failure: ${e.message}")
+                errorMessage.value = "Network Error: ${e.localizedMessage}"
             } finally {
-                isLoading.postValue(false)
+                isLoading.value = false
             }
         }
+    }
+
+
+    fun fetchPlans(profileId: Int) {
+        viewModelScope.launch {
+            isLoading.value = true
+            try {
+                val response = repository.getPlans(profileId)
+                if (response.isSuccessful) {
+                    activePlansResult.value = response.body()
+                } else {
+                    errorMessage.value = "Fetch Error: ${response.code()}"
+                }
+            } catch (e: Exception) {
+                errorMessage.value = e.localizedMessage
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
+}
+
+
+class WorkoutViewModelFactory(private val repository: GenerateWorkoutRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(WorkoutViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return WorkoutViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
