@@ -19,8 +19,9 @@ class LoginPage : AppCompatActivity() {
     lateinit var emailInput: EditText
     lateinit var passwordInput: EditText
     lateinit var loginBtn: Button
-    val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
-    val editor = prefs.edit()
+
+    lateinit var prefs: android.content.SharedPreferences
+    lateinit var editor: android.content.SharedPreferences.Editor
     // Bottom Navigation
     //private lateinit var bottomNavigationView: BottomNavigationView
 
@@ -33,7 +34,8 @@ class LoginPage : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         this.enableEdgeToEdge()
         setContentView(R.layout.activity_login_page) //changed this from activity_main to login_page fixed R.id.----- errors below
-
+        prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        editor = prefs.edit()
         // Login setup
         emailInput = findViewById(R.id.email_input)
         passwordInput = findViewById(R.id.password_input)
@@ -44,7 +46,9 @@ class LoginPage : AppCompatActivity() {
             val password = passwordInput.text.toString()
             Log.i("Test Credentials", "Email : $email and Password : $password")
             editor.putBoolean("isLoggedIn", true)
+            editor.apply()
 
+            Toast.makeText(this, "Logged in!", Toast.LENGTH_SHORT).show()
         }
 
         // Bottom Navigation setup
