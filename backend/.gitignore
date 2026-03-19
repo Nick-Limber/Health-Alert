@@ -1,1 +1,7 @@
+<<<<<<< HEAD
 /node_modules
+=======
+/node_modules
+.env*
+!.env.example
+>>>>>>> b4f84c7 (add global git ignore -- create base middleware for verification (authorization) -- add example env file for backend)

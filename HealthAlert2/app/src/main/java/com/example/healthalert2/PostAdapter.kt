@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class PostAdapter(private val postList: List<Post>) :
+class PostAdapter(private var postList: MutableList<Post>) :
     RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -29,4 +29,10 @@ class PostAdapter(private val postList: List<Post>) :
     }
 
     override fun getItemCount(): Int = postList.size
+
+    fun updatePosts(newPosts: List<Post>) {
+        postList.clear()
+        postList.addAll(newPosts)
+        notifyDataSetChanged()
+    }
 }
