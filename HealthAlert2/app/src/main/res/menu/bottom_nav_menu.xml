@@ -14,4 +14,8 @@
         android:id="@+id/nav_account"
         android:icon="@android:drawable/ic_menu_myplaces"
         android:title="Account" />
+    <item
+        android:id="@id/workout_plan"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Plan"/>
 </menu>

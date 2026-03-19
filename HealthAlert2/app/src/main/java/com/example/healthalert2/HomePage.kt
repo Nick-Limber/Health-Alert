@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.widget.Toast
+import com.example.healthalert2.data.network.WorkoutPlan
 
 class HomePage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,6 +28,12 @@ class HomePage : AppCompatActivity() {
 
                 R.id.nav_account -> {
                     val intent = Intent(this, AccountPage::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                R.id.workout_plan ->{
+                    val intent = Intent(this, WorkoutPlanActivity::class.java)
                     startActivity(intent)
                     true
                 }
