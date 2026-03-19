@@ -16,8 +16,7 @@ class HomePage : AppCompatActivity() {
             when(it.itemId) {
 
                 R.id.nav_home -> {
-                    Toast.makeText(this, "Home Selected", Toast.LENGTH_SHORT).show()
-                    true
+                   true
                 }
 
                 R.id.nav_forum -> {
@@ -27,7 +26,8 @@ class HomePage : AppCompatActivity() {
                 }
 
                 R.id.nav_account -> {
-                    Toast.makeText(this, "Account Selected", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, AccountPage::class.java)
+                    startActivity(intent)
                     true
                 }
 
