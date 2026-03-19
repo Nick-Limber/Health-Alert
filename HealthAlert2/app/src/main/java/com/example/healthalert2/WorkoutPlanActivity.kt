@@ -1,5 +1,6 @@
 package com.example.healthalert2
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.healthalert2.data.network.RetrofitClient
 import com.example.healthalert2.data.repository.GenerateWorkoutRepository
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class WorkoutPlanActivity : AppCompatActivity() {
@@ -69,5 +71,36 @@ class WorkoutPlanActivity : AppCompatActivity() {
         }
 
         viewModel.fetchPlans(5)
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        bottomNav.setOnItemSelectedListener {
+            when(it.itemId) {
+
+                R.id.nav_home -> {
+                    val intent = Intent(this, HomePage::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                R.id.nav_forum -> {
+                    val intent = Intent(this, CommunityForumActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                R.id.nav_account -> {
+                    val intent = Intent(this, AccountPage::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                R.id.workout_plan ->{
+
+                    true
+                }
+
+                else -> false
+            }
+        }
     }
+
 }
