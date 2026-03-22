@@ -35,4 +35,17 @@ router.get("/", async (req, res) => {
     }
 });
 
+//to UPDATE posts
+router.put("/:id", async (req, res) => {
+    const postId = req.params.id;
+    const { title, content } = req.body;
+
+    await db_pool.query(
+        "UPDATE Posts SET title = ?, content = ? WHERE postId = ?",
+        [title, content, postId]
+    );
+
+    res.json({ message: "Post updated" });
+});
+
 export default router;
