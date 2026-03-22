@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.widget.Toast
+import com.example.healthalert2.data.network.WorkoutPlan
 
 class HomePage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,8 +17,7 @@ class HomePage : AppCompatActivity() {
             when(it.itemId) {
 
                 R.id.nav_home -> {
-                    Toast.makeText(this, "Home Selected", Toast.LENGTH_SHORT).show()
-                    true
+                   true
                 }
 
                 R.id.nav_forum -> {
@@ -27,7 +27,14 @@ class HomePage : AppCompatActivity() {
                 }
 
                 R.id.nav_account -> {
-                    Toast.makeText(this, "Account Selected", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, AccountPage::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                R.id.workout_plan ->{
+                    val intent = Intent(this, WorkoutPlanActivity::class.java)
+                    startActivity(intent)
                     true
                 }
 

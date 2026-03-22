@@ -104,7 +104,8 @@ class CommunityForumActivity : AppCompatActivity() {
                 }
 
                 R.id.nav_account -> {
-                    Toast.makeText(this, "Account Selected", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, AccountPage::class.java)
+                    startActivity(intent)
                     true
                 }
 

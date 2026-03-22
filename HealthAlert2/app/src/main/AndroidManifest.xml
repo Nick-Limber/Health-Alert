@@ -18,14 +18,24 @@
             android:name=".WorkoutPlanActivity"
             android:exported="true" />
         <activity
+            android:name=".MembershipsPage"
+            android:exported="false" />
+        <activity
+            android:name=".SettingsPage"
+            android:exported="false" />
+        <activity
+            android:name=".AccountPage"
+            android:exported="false" />
+        <activity
             android:name=".HomePage"
             android:exported="false" />
         <activity
             android:name=".LoginPage"
             android:exported="false" />
-        <activity
+        <!--<activity
             android:name=".MainActivity2"
             android:exported="false" />
+            -->
         <activity
             android:name=".MainActivity"
             android:exported="true"

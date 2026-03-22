@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "169727330644",
+    "project_id": "healthalertfb",
+    "storage_bucket": "healthalertfb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:169727330644:android:64944b8ca9d01ddc6aa0c1",
+        "android_client_info": {
+          "package_name": "com.example.healthalert2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy9UltITWWWTsjPsFRJvimmfcfNxwLRhk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
