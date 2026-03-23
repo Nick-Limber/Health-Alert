@@ -5,11 +5,13 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.GET
 import retrofit2.http.Query
-interface GeneratePlanApiService {
 
-    @POST("/recommendation/generate")
-    suspend fun generateWorkoutPlan(
-        @Body request: LoginRequest
-    ): Response<LoginResponse>
+interface loginApiService {
+
+    @POST("/authentication/login")
+    suspend fun postAuthLogin(
+        @Body request: GeneratePlanRequest
+    ): Response<WorkoutResponse>
+
 
 }
