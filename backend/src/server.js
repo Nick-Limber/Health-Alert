@@ -18,10 +18,12 @@ app.use(express.urlencoded({ extended: true }));
 // API ROUTES
 app.use("/authentication", authenticationRoutes);
 
+app.use("/posts", postsRoutes);
+app.use("/recommendation", recommendationRoutes);
 
-app.listen(PORT, () => {
-    console.log(`server running on PORT ${PORT}`)
-})
+const server = app.listen(PORT, "0.0.0.0", () => {
+    console.log(`server running on PORT ${PORT}`);
+});
 
 process.on("unhandledRejection", (err) => {
     console.error("unhandledRejection:", err);
