@@ -1,6 +1,5 @@
 package com.example.healthalert2
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -13,13 +12,6 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.widget.Toast
-import com.example.healthalert2.data.network.LoginRequest
-import com.example.healthalert2.data.network.LoginResponse
-import com.example.healthalert2.data.network.RetrofitClient
-import retrofit2.Call
-import retrofit2.Response
-import javax.security.auth.callback.Callback
-
 
 class LoginPage : AppCompatActivity() {
 
@@ -52,39 +44,11 @@ class LoginPage : AppCompatActivity() {
         loginBtn.setOnClickListener {
             val email = emailInput.text.toString()
             val password = passwordInput.text.toString()
+            Log.i("Test Credentials", "Email : $email and Password : $password")
+            editor.putBoolean("isLoggedIn", true)
+            editor.apply()
 
-            // 1. Create the request object (using the data class you made)
-            val loginRequest = LoginRequest(email, password)
-
-            // 2. Make the API call
-            RetrofitClient.generatePlanApiService.loginApiService(loginRequest).enqueue(object : Callback<LoginResponse> {
-                override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-                    if (response.isSuccessful && response.body() != null) {
-                        val authResponse = response.body()!!
-
-                        // 3. Store the Token and Status
-                        val sharedPref = getSharedPreferences("HealthPrefs", Context.MODE_PRIVATE)
-                        val editor = sharedPref.edit()
-
-                        editor.putString("jwt_token", authResponse.data.token)
-                        editor.putBoolean("isLoggedIn", true)
-                        editor.apply()
-
-                        Toast.makeText(this@LoginActivity, "Welcome back!", Toast.LENGTH_SHORT).show()
-
-                        // 4. Navigate to Main Screen
-                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                        finish()
-                    } else {
-                        Toast.makeText(this@LoginActivity, "Login Failed: ${response.code()}", Toast.LENGTH_SHORT).show()
-                    }
-                }
-
-                override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                    Log.e("API_ERROR", "Message: ${t.message}")
-                    Toast.makeText(this@LoginActivity, "Network Error!", Toast.LENGTH_SHORT).show()
-                }
-            })
+            Toast.makeText(this, "Logged in!", Toast.LENGTH_SHORT).show()
         }
 
         // Bottom Navigation setup
