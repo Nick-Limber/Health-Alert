@@ -1,7 +1,7 @@
 package com.example.healthalert2
 
 import com.example.healthalert2.data.network.GeneratePlanRequest
-import com.example.healthalert2.data.network.RetrofitClient
+import com.example.healthalert2.data.network.retrofitClient
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.Assert.*
@@ -23,7 +23,7 @@ class WorkoutNetworkTest {
             workout_name = "none"
         )
 
-        val response = RetrofitClient.generatePlanApiService.generateWorkoutPlan(request)
+        val response = retrofitClient.generatePlanApiService.generateWorkoutPlan(request)
 
         println("Response Code: ${response.code()}")
 
@@ -56,7 +56,7 @@ class WorkoutNetworkTest {
     @Test
     fun testFetchActivePlans() = runBlocking {
         // Test for retrieving existing plans
-        val response = RetrofitClient.generatePlanApiService.fetchWorkoutPlan(3)
+        val response = retrofitClient.generatePlanApiService.fetchWorkoutPlan(3)
 
         println("Fetch Response Code: ${response.code()}")
 
