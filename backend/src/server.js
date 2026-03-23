@@ -7,6 +7,7 @@ import authenticationRoutes from "./routes/authenticationRoutes.js";
 import postsRoutes from "./routes/postsRoutes.js";
 import recommendationRoutes from "./routes/recommendationRoutes.js";
 import membershipRoutes from "./routes/membershipRoutes.js"
+
 // ADD ENV VARIABLES AND CONNECT TO DB
 config();
 
@@ -19,9 +20,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // API ROUTES
 app.use("/authentication", authenticationRoutes);
+
 app.use("/posts", postsRoutes);
 app.use("/recommendation", recommendationRoutes);
 app.use("/membership", membershipRoutes)
+
 const server = app.listen(PORT, "0.0.0.0", () => {
     console.log(`server running on PORT ${PORT}`);
 });

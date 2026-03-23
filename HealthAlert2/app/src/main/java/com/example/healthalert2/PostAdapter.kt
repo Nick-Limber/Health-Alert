@@ -1,5 +1,6 @@
 package com.example.healthalert2
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,9 +24,23 @@ class PostAdapter(private var postList: MutableList<Post>) :
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = postList[position]
+
         holder.tvTitle.text = post.title
         holder.tvContent.text = post.content
         holder.tvTimestamp.text = post.timestamp
+
+        // HOLD CLICK ON A POST ALLOWS TO EDIT
+        holder.itemView.setOnLongClickListener {
+            val intent = Intent(holder.itemView.context, CreatePostActivity::class.java)
+
+            intent.putExtra("postId", post.postId)
+            intent.putExtra("title", post.title)
+            intent.putExtra("content", post.content)
+
+            holder.itemView.context.startActivity(intent)
+
+            true
+        }
     }
 
     override fun getItemCount(): Int = postList.size
@@ -34,5 +49,10 @@ class PostAdapter(private var postList: MutableList<Post>) :
         postList.clear()
         postList.addAll(newPosts)
         notifyDataSetChanged()
+    }
+
+    fun addPost(post: Post) {
+        postList.add(0, post)
+        notifyItemInserted(0)
     }
 }
