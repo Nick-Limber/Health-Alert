@@ -79,6 +79,15 @@ public class LineGraph extends View {
         float height = getHeight();
         int n = datapoints.size();
 
+        //paddinng
+        float paddingTop = 40f;
+        float paddingBottom = 40f;
+        float paddingLeft = 50f;
+        float paddingRight = 50f;
+
+        float graphHeight = height - paddingTop - paddingBottom;
+        float graphWidth = width - paddingLeft - paddingRight;
+
         //find min and max for Y
         float min = Float.MAX_VALUE;
         float max = Float.MIN_VALUE;
@@ -94,37 +103,45 @@ public class LineGraph extends View {
             }
         }
 
-        float gap = width / (n-1);
+        //buff
+        float buffer = (max - min) * 0.1f;
+        if (buffer == 0)
+        {
+            max += buffer;
+            min -= buffer;
+        }
+
+        float gap = graphWidth / (n-1);
 
         //draw lines
         for (int i = 0; i < n - 1; i++)
         {
-            float startX = i * gap;
-            float startY = height - ((datapoints.get(i) - min) / (max - min)) * height;
+            float startX = paddingLeft + i * gap;
+            float startY = paddingTop + graphHeight * (1 - (datapoints.get(i) - min) / (max - min));
 
-            float endX = (i +1 ) * gap;
-            float endY = height - ((datapoints.get(i + 1) - min) / (max - min)) * height;
+            float endX = paddingLeft + (i + 1) * gap;
+            float endY = paddingTop + graphHeight * (1 - (datapoints.get(i + 1) - min) / (max - min));
 
             canvas.drawLine(startX, startY, endX, endY, linePaint);
             canvas.drawCircle(startX, startY, 8, pointPaint);
         }
 
         //last point
-        float lastX = (n-1)*gap;
-        float lastY = height - ((datapoints.get(n - 1) - min) / (max - min)) *height;
+        float lastX = paddingLeft + (n-1) * gap;
+        float lastY = paddingTop + graphHeight * (1 - (datapoints.get(n - 1) - min) / (max - min));
         canvas.drawCircle(lastX,lastY, 8, pointPaint);
 
         //x axis labels
         for (int i = 0; i < labels.size(); i++)
         {
-            float x = i * gap;
-            float y = height + 30;
+            float x = paddingLeft + i * gap;
+            float y = height - paddingBottom + 30;
             canvas.drawText(labels.get(i), x - 30, y, textPaint);
         }
 
         //min&max on Y
-        canvas.drawText(String.valueOf((int) min), 5, height - 5, textPaint);
-        canvas.drawText(String.valueOf((int) max), 5, 30, textPaint);
+        canvas.drawText(String.valueOf((int) min), 5, height - paddingBottom, textPaint);
+        canvas.drawText(String.valueOf((int) max), 5, paddingTop, textPaint);
     }
 
 

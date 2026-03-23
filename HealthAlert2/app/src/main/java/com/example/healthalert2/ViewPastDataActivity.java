@@ -10,7 +10,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import okhttp3.Call;
@@ -63,6 +65,29 @@ public class ViewPastDataActivity extends AppCompatActivity {
         weightLabels.add("March 3");
 
         graph.setData(weightValues, weightTimeStamps);
+
+        weightLabels.clear();
+
+        for (int i = 0; i < weightValues.size(); i++)
+        {
+            String rawTime = weightTimeStamps.get(i);
+            String day;
+
+            try {
+                SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd");
+                Date date = dbFormat.parse(rawTime);
+                day = displayFormat.format(date);
+            } catch (Exception e) {
+                day = rawTime;
+            }
+
+            weightLabels.add(day + ": " + weightValues.get(i) + " lbs");
+        }
+
+        weightList.setAdapter(new ArrayAdapter<>(
+                this, android.R.layout.simple_list_item_1, weightLabels
+        ));
 
         //nutritionn
         List<String> nutritionString = new ArrayList<>();
