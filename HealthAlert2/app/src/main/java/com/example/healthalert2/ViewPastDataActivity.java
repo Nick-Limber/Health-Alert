@@ -3,33 +3,203 @@ package com.example.healthalert2;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
 import androidx.appcompat.app.AppCompatActivity;
 
-public class ViewPastDataActivity extends AppCompatActivity
-{
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+
+public class ViewPastDataActivity extends AppCompatActivity {
+
+    private LineGraph graph;
+    private ListView weightList;
+    private ListView nutritionList;
+    private ListView workoutList;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-            super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_past_data);
 
-            setContentView(R.layout.activity_past_data);
+        graph = findViewById(R.id.simpleGraph);
+        weightList = findViewById(R.id.weightList);
+        nutritionList = findViewById(R.id.nutritionList);
+        workoutList = findViewById(R.id.workoutList);
 
-            ListView listView = findViewById(R.id.listViewPastData);
-
-            String[] sampleData = new String[]{
-                "Entry 1: 1/21/2026",
-                "Entry 2: 2/13/2026",
-                "Entry 3: 2/20/2026"
-            };
-
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_1,
-                sampleData
-            );
-
-            listView.setAdapter(adapter);
+        //temp data
+        //showSampleData();
+        fetchPastDataFromBackend();
     }
 
+    /*private void showSampleData()
+    {
+        //sample weight
+        List<Float> weightValues = new ArrayList<>();
+        List<String> weightTimeStamps = new ArrayList<>();
+        List<String> weightLabels = new ArrayList<>();
+
+        weightValues.add(200f);
+        weightValues.add(190f);
+        weightValues.add(187f);
+
+        weightTimeStamps.add("2026-03-01 10:30:33");
+        weightTimeStamps.add("2026-03-02 11:12:55");
+        weightTimeStamps.add("2026-03-03 09:50:27");
+
+        weightLabels.add("March 1");
+        weightLabels.add("March 2");
+        weightLabels.add("March 3");
+
+        graph.setData(weightValues, weightTimeStamps);
+
+        weightLabels.clear();
+
+        for (int i = 0; i < weightValues.size(); i++)
+        {
+            String rawTime = weightTimeStamps.get(i);
+            String day;
+
+            try {
+                SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd");
+                Date date = dbFormat.parse(rawTime);
+                day = displayFormat.format(date);
+            } catch (Exception e) {
+                day = rawTime;
+            }
+
+            weightLabels.add(day + ": " + weightValues.get(i) + " lbs");
+        }
+
+        weightList.setAdapter(new ArrayAdapter<>(
+                this, android.R.layout.simple_list_item_1, weightLabels
+        ));
+
+        //nutrition
+        List<String> nutritionString = new ArrayList<>();
+        nutritionString.add("March 1 - Keto - 2500 cals - 100g protein - 0g carbs");
+        nutritionString.add("March 2 - Low Cal - 1500 cals - 90g protein - 70g carbs");
+
+        nutritionList.setAdapter(new ArrayAdapter<>(
+                this, android.R.layout.simple_list_item_1, nutritionString
+        ));
+
+        //exercise
+        List<String> workoutStrings = new ArrayList<>();
+        workoutStrings.add("Bench Press - 5x5 - 225 lbs");
+        workoutStrings.add("Squat - 3x8 - 175 lbs");
+
+        workoutList.setAdapter(new ArrayAdapter<>(
+                this, android.R.layout.simple_list_item_1,workoutStrings
+        ));
+    }*/
+
+    private void fetchPastDataFromBackend() {
+        String url = "http://10.0.2.2:5001/health/pastdata"; //backend endpoint
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        StringRequest request = new StringRequest(Request.Method.GET, url,
+                respone -> {
+                    try {
+                        JSONObject json = new JSONObject(respone);
+
+                        //weight
+                        JSONArray weightArray = json.getJSONArray("weights");
+                        List<Float> weightValues = new ArrayList<>();
+                        List<String> weightTimeStamps = new ArrayList<>();
+                        List<String> weightLabels = new ArrayList<>();
+
+                        for (int i = 0; i < weightArray.length(); i++) {
+                            JSONObject entry = weightArray.getJSONObject(i);
+
+                            float weight = (float) entry.getDouble("weight");
+                            String rawTime = entry.getString("recordAt");
+
+                            weightValues.add(weight);
+                            weightTimeStamps.add(rawTime);
+
+                            //format date
+                            String day;
+                            try {
+                                SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd");
+                                Date date = dbFormat.parse(rawTime);
+                                day = displayFormat.format((date));
+                            } catch (Exception e) {
+                                day = rawTime;
+                            }
+
+                            weightLabels.add(day + ": " + weight + " lbs");
+                        }
+
+                        graph.setData(weightValues, weightTimeStamps);
+
+                        weightList.setAdapter(new ArrayAdapter<>(
+                                this,
+                                android.R.layout.simple_list_item_1,
+                                weightLabels
+                        ));
+
+                        //nutrition
+                        JSONArray nutritionArray = json.getJSONArray("nutrition");
+                        List<String> nutritionStrings = new ArrayList<>();
+
+                        for (int i = 0; i < nutritionArray.length(); i++) {
+                            JSONObject entry = nutritionArray.getJSONObject(i);
+
+                            nutritionStrings.add(
+                                    entry.getString("recordAt") + " - " +
+                                            entry.getInt("calories") + " cals - " +
+                                            entry.getInt("protein") + "g protein - " +
+                                            entry.getInt("carbs") + "g carbs"
+                            );
+                        }
+
+                        nutritionList.setAdapter(new ArrayAdapter<>(
+                                this,
+                                android.R.layout.simple_list_item_1,
+                                nutritionStrings
+                        ));
+
+                        //workouts
+                        JSONArray workoutArray = json.getJSONArray("exercise");
+                        List<String> workoutStrings = new ArrayList<>();
+
+                        for (int i = 0; i < workoutArray.length(); i++) {
+                            JSONObject entry = workoutArray.getJSONObject(i);
+
+                            workoutStrings.add(
+                                    entry.getString("exercise_type") + " - " +
+                                            entry.getInt("sets") + "x" +
+                                            entry.getInt("reps") + " - " +
+                                            entry.getInt("weight") + " lbs"
+                            );
+                        }
+
+                        workoutList.setAdapter(new ArrayAdapter<>(
+                                this,
+                                android.R.layout.simple_list_item_1,
+                                workoutStrings
+                        ));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> error.printStackTrace()
+        );
+        queue.add(request);
+    }
 }

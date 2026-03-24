@@ -37,6 +37,11 @@ class HomePage : AppCompatActivity() {
                     startActivity(intent)
                     true
                 }
+                R.id.nav_past_data -> {
+                    val intent = Intent(this, WorkoutPlanActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
 
                 else -> false
             }
