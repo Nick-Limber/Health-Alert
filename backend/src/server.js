@@ -4,6 +4,8 @@ import { close_pool, db_pool } from "./config/db.js";
 
 // IMPORT ROUTES
 import authenticationRoutes from "./routes/authenticationRoutes.js";
+import postsRoutes from "./routes/postsRoutes.js";
+import recommendationRoutes from "./routes/recommendationRoutes.js";
 
 // ADD ENV VARIABLES AND CONNECT TO DB
 config();
@@ -17,10 +19,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // API ROUTES
 app.use("/authentication", authenticationRoutes);
-
 app.use("/posts", postsRoutes);
 app.use("/recommendation", recommendationRoutes);
-
+app.use("/subscription", )
 const server = app.listen(PORT, "0.0.0.0", () => {
     console.log(`server running on PORT ${PORT}`);
 });

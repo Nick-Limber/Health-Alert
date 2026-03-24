@@ -1,4 +1,4 @@
-import express, { application } from "express";
+import express from "express";
 import { register, login } from "../controllers/authenticationController.js";
 
 const router = express.Router();

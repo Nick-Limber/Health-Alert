@@ -9,7 +9,13 @@ interface GeneratePlanApiService {
 
     @POST("/recommendation/generate")
     suspend fun generateWorkoutPlan(
-        @Body request: LoginRequest
-    ): Response<LoginResponse>
+        @Body request: GeneratePlanRequest
+    ): Response<WorkoutResponse>
+
+    @GET("recommendation/getPlans/")
+    suspend fun fetchWorkoutPlan(
+        @Query("profile_id") profileId: Int
+    ): Response<WorkoutResponse>
+
 
 }
