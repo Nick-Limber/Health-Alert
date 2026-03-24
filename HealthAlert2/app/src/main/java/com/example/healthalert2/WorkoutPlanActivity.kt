@@ -71,36 +71,6 @@ class WorkoutPlanActivity : AppCompatActivity() {
         }
 
         viewModel.fetchPlans(5)
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        bottomNav.setOnItemSelectedListener {
-            when(it.itemId) {
-
-                R.id.nav_home -> {
-                    val intent = Intent(this, HomePage::class.java)
-                    startActivity(intent)
-                    true
-                }
-
-                R.id.nav_forum -> {
-                    val intent = Intent(this, CommunityForumActivity::class.java)
-                    startActivity(intent)
-                    true
-                }
-
-                R.id.nav_account -> {
-                    val intent = Intent(this, AccountPage::class.java)
-                    startActivity(intent)
-                    true
-                }
-
-                R.id.workout_plan ->{
-
-                    true
-                }
-
-                else -> false
-            }
-        }
     }
 
 }
