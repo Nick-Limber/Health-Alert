@@ -40,13 +40,13 @@ const generate = async (req, res) => {
                 day1_list.push("cardio");
                 day2_list.push("cardio");
             }
-            if (goal === "lose weight") {
+            if (goal === "weight loss") {
                 day1_list.push("cardio");
                 day2_list.push("cardio");
             }
 
             let day1_len = day1_list.length;
-            if (muscle != "None") {
+            if (muscle != "none") {
                 for (let i = day1_len; i < 5; i++) {
                     day1_list.push(muscle);
                 }
@@ -58,8 +58,7 @@ const generate = async (req, res) => {
             const usedIds = new Set();
 
             const buildDay = (slots, pool) => {
-                // Return the result of the map!
-                return slots.map(slot => {
+                return slots.map((slot, index) => {
                     let candidates;
                     if (slot === 'cardio') {
                         candidates = pool.filter(row => row.category === 'cardio' && !usedIds.has(row.exercise_id));
@@ -69,13 +68,20 @@ const generate = async (req, res) => {
                         candidates = pool.filter(row => row.muscle_target === slot && !usedIds.has(row.exercise_id));
                     }
 
+                    // --- NEW DEBUG LOGS ---
+                    console.log(`--- Slot ${index + 1} (${slot}) ---`);
+                    console.log(`Found ${candidates.length} candidates in pool.`);
+
                     const selection = randomExercise(candidates.length ? candidates : pool);
 
                     if (selection) {
+                        console.log(`Selected: ${selection.exercise_name} (ID: ${selection.exercise_id})`);
                         usedIds.add(selection.exercise_id);
                         return selection;
                     }
-                    return { exercise_name: "Generic Exercise", exercise_id: 0 }; // Ultimate fallback
+
+                    console.error(`!!! FAILED TO SELECT for slot: ${slot}. Using fallback.`);
+                    return { exercise_name: "Generic Exercise", exercise_id: 0 };
                 });
             };
 
@@ -199,5 +205,3 @@ const getPlans = async (req, res) => {
 };
 
 export { generate, getPlans };
-
-

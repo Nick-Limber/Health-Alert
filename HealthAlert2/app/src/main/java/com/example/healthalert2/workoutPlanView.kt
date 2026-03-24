@@ -10,13 +10,15 @@ import com.example.healthalert2.data.network.WorkoutPlan
 import com.example.healthalert2.data.network.WorkoutResponse
 import com.example.healthalert2.data.repository.GenerateWorkoutRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 class WorkoutViewModel(private val repository: GenerateWorkoutRepository) : ViewModel() {
 
     val workoutPlanResult = MutableLiveData<WorkoutResponse?>()
     val activePlansResult = MutableLiveData<WorkoutResponse?>()
     val isLoading = MutableLiveData<Boolean>(false)
     val errorMessage = MutableLiveData<String?>()
-
     fun generateNewPlan(request: GeneratePlanRequest) {
         viewModelScope.launch {
             isLoading.value = true
@@ -24,30 +26,34 @@ class WorkoutViewModel(private val repository: GenerateWorkoutRepository) : View
 
             try {
                 val hardcodedRequest = request.copy(profile_id = 5)
+                // Retrofit handles its own thread, so this is fine
                 val response = repository.getWorkoutPlan(hardcodedRequest)
 
                 if (response.isSuccessful) {
                     val responseBody = response.body()
-
                     val newPlan = responseBody?.data
 
-                    if (newPlan != null && newPlan is List<*>) {
-                        val currentList = activePlansResult.value?.data?.toMutableList() ?: mutableListOf()
-                        currentList.addAll(newPlan as List<WorkoutPlan>)
-                        activePlansResult.postValue(WorkoutResponse(success = true, data = currentList))
-                    } else if (newPlan != null) {
-                        val currentList = activePlansResult.value?.data?.toMutableList() ?: mutableListOf()
-                        currentList.add(newPlan as WorkoutPlan)
-                        activePlansResult.postValue(WorkoutResponse(success = true, data = currentList))
-                    }
+                    // SHIFT TO BACKGROUND for list processing
+                    withContext(Dispatchers.Default) {
+                        if (newPlan != null) {
+                            val currentList = activePlansResult.value?.data?.toMutableList() ?: mutableListOf()
 
-                    Log.d("API_DEBUG", "Generated successfully for Profile 4")
+                            if (newPlan is List<*>) {
+                                currentList.addAll(newPlan as List<WorkoutPlan>)
+                            } else {
+                                currentList.add(newPlan as WorkoutPlan)
+                            }
+
+                            // postValue is thread-safe and updates the UI from the background
+                            activePlansResult.postValue(WorkoutResponse(success = true, data = currentList))
+                        }
+                    }
+                    Log.d("API_DEBUG", "Generated successfully for Profile 5")
                 } else {
                     errorMessage.value = "Server Error: ${response.code()}"
                 }
             } catch (e: Exception) {
                 errorMessage.value = "Network Error: ${e.localizedMessage}"
-                Log.e("API_DEBUG", "Error: ${e.message}")
             } finally {
                 isLoading.value = false
             }
