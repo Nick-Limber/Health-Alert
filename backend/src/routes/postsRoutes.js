@@ -26,7 +26,6 @@ router.post("/", async (req, res) => {
 // GET all posts (Mysql to andriod studio)
 router.get("/", async (req, res) => {
     try {
-        // Match to SQL table name
         const [rows] = await db_pool.query("SELECT * FROM Posts");
         res.json(rows);
     } catch (error) {
@@ -46,6 +45,27 @@ router.put("/:id", async (req, res) => {
     );
 
     res.json({ message: "Post updated" });
+});
+
+// DELETE a post
+router.delete("/:id", async (req, res) => {
+    const postId = req.params.id;
+
+    try {
+        const [result] = await db_pool.query(
+            "DELETE FROM Posts WHERE postId = ?",
+            [postId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        res.status(200).json({ message: "Post deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting post:", error);
+        res.status(500).json({ error: "Failed to delete post" });
+    }
 });
 
 export default router;
