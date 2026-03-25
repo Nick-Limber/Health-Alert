@@ -25,10 +25,14 @@ class ExerciseAdapter(private val exercises: List<WorkoutExercise>) :
     override fun onBindViewHolder(holder: ExerciseViewHolder, position: Int) {
         val exercise = exercises[position]
 
-        holder.name.text = exercise.name ?: "Unknown Exercise"
-        holder.muscle.text = "Target: ${exercise.target ?: "General"}"
+        // FIX: Match these to your WorkoutExercise.kt data class fields
+        holder.name.text = exercise.exerciseName
 
-        holder.category.text = "Order: ${exercise.order}"
+        // Use 'muscleTarget' instead of 'target'
+        holder.muscle.text = "Target: ${exercise.muscleTarget}"
+
+        // Use 'category' instead of 'order' (as per the new model)
+        holder.category.text = exercise.category
     }
 
     override fun getItemCount() = exercises.size

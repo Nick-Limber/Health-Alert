@@ -22,20 +22,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16.dp"
-        android:layout_marginBottom="32dp"
-        app:layout_insetEdge="bottom"
-        android:contentDescription="Generate workout plan"
-        app:backgroundTint="#1976D2"
-        app:srcCompat="@android:drawable/ic_input_add"
-        app:tint="@color/white" />
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="20dp"
+        app:srcCompat="@android:drawable/ic_input_add" />
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        app:menu="@menu/bottom_nav_menu"/>
+        android:layout_gravity="bottom"
+        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

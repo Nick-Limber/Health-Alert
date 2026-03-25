@@ -6,15 +6,23 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class WorkoutResponse(
     val success: Boolean,
-    val data: List<WorkoutPlan>
+    val data: List<WorkoutData>
 )
 
 @JsonClass(generateAdapter = true)
-data class WorkoutPlan(
+data class WorkoutData(
     @Json(name = "plan_id") val planId: Int,
-    @Json(name = "workout_name") val workoutName: String,
+    @Json(name = "workout_name") val workoutName: String?,
     val goal: String,
-    val days: List<WorkoutDay> // Nested list of days
+    val days: List<WorkoutDay>
+)
+
+@JsonClass(generateAdapter = true)
+data class PlanInfo(
+
+    @Json(name = "workout_name") val workoutName: String?,
+    val goal: String
+
 )
 
 @JsonClass(generateAdapter = true)
@@ -25,7 +33,7 @@ data class WorkoutDay(
 
 @JsonClass(generateAdapter = true)
 data class WorkoutExercise(
-    val name: String,
-    val target: String,
-    val order: Int
+    @Json(name = "exercise_name") val exerciseName: String, // Fixes 'exercise_name'
+    @Json(name = "muscle_target") val muscleTarget: String, // Fixes 'muscle_target'
+    val category: String                                   // Fixes 'category'
 )

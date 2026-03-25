@@ -14,11 +14,12 @@ const db_pool = mysql.createPool({
     port:process.env.DB_PORT,
     waitForConnections: true,
     connectionLimit: 10,
-    // Added path to CA certificate file (PEM)
+    enableKeepAlive: true,        // Prevents the "Reset" error you saw
+    keepAliveInitialDelay: 10000, // Sends a "ping" every 10 seconds
     ssl: {
-            //ca: fs.readFileSync(caPath),
-            rejectUnauthorized: false
-        }
+        ca: fs.readFileSync(caPath),
+        rejectUnauthorized: true  // Ensures the cert is strictly validated
+    }
 });
 
 const close_pool = async () => {
