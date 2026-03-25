@@ -3,6 +3,7 @@ package com.example.healthalert2
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -22,4 +23,8 @@ interface PostApi {
         @Path("id") id: Int,
         @Body post: Post
     ): Call<Void>
+
+    //to delete post
+    @DELETE("posts/{id}")
+    fun deletePost(@Path("id") postId: Int): Call<Void>
 }

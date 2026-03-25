@@ -22,9 +22,6 @@ public class LineGraph extends View {
     private Paint pointPaint;
     private Paint textPaint;
 
-    private SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd");
-    private SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
     public LineGraph (Context context, @Nullable AttributeSet attrs)
     {
         super(context, attrs);
@@ -45,22 +42,11 @@ public class LineGraph extends View {
         datapoints = new ArrayList<>();
         labels = new ArrayList<>();
     }
-    public void setData(List<Float> data, List<String> rawTimeStamp)
+    public void setData(List<Float> data, List<String> formattedTimeStamps)
     {
         this.datapoints = data;
 
-        labels.clear();
-        for (String ts : rawTimeStamp)
-        {
-            try {
-                Date date = dbFormat.parse(ts);
-                labels.add(displayFormat.format(date));
-            }
-            catch (ParseException e)
-            {
-                labels.add(ts);
-            }
-        }
+        this.labels = new ArrayList<>(formattedTimeStamps);
 
         invalidate();
     }

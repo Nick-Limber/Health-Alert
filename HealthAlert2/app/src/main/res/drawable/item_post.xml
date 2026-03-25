@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <!-- Post Title -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Title"
+        android:textStyle="bold"
+        android:textSize="16sp"/>
+
+    <!-- Post Content -->
+    <TextView
+        android:id="@+id/tvContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvTitle"
+        android:text="Content"
+        android:textSize="14sp"
+        android:layout_marginTop="4dp"/>
+
+    <!-- Timestamp -->
+    <TextView
+        android:id="@+id/tvTimestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvContent"
+        android:text="Timestamp"
+        android:textSize="12sp"
+        android:layout_marginTop="4dp"/>
+
+    <!--Delete Button-->
+    <ImageButton
+        android:id="@+id/btnDelete"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:background="@null"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="8dp"
+        android:contentDescription="Delete Post"/>
+
+</RelativeLayout>

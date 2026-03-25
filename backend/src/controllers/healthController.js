@@ -1,5 +1,5 @@
 import { db_pool } from "../config/db.js";
-
+ 
 export const getPastData = async (req, res) => {
     try {
         const [rows] = await db_pool.querey(

@@ -12,7 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.healthalert2.data.network.retrofitClient
+import com.example.healthalert2.data.network.RetrofitClient
 import com.example.healthalert2.data.repository.GenerateWorkoutRepository
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -34,7 +34,7 @@ class WorkoutPlanActivity : AppCompatActivity() {
             insets
         }
 
-        val apiService = retrofitClient.generatePlanApiService
+        val apiService = RetrofitClient.generatePlanApiService
         val repository = GenerateWorkoutRepository(apiService)
         val factory = WorkoutViewModelFactory(repository)
         viewModel = ViewModelProvider(this, factory)[WorkoutViewModel::class.java]
