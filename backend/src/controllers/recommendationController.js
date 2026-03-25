@@ -40,13 +40,13 @@ const generate = async (req, res) => {
                 day1_list.push("cardio");
                 day2_list.push("cardio");
             }
-            if (goal === "lose weight") {
+            if (goal === "weight loss") {
                 day1_list.push("cardio");
                 day2_list.push("cardio");
             }
 
             let day1_len = day1_list.length;
-            if (muscle != "None") {
+            if (muscle != "none") {
                 for (let i = day1_len; i < 5; i++) {
                     day1_list.push(muscle);
                 }
@@ -58,8 +58,7 @@ const generate = async (req, res) => {
             const usedIds = new Set();
 
             const buildDay = (slots, pool) => {
-                // Return the result of the map!
-                return slots.map(slot => {
+                return slots.map((slot, index) => {
                     let candidates;
                     if (slot === 'cardio') {
                         candidates = pool.filter(row => row.category === 'cardio' && !usedIds.has(row.exercise_id));
@@ -69,13 +68,20 @@ const generate = async (req, res) => {
                         candidates = pool.filter(row => row.muscle_target === slot && !usedIds.has(row.exercise_id));
                     }
 
+                    // --- NEW DEBUG LOGS ---
+                    console.log(`--- Slot ${index + 1} (${slot}) ---`);
+                    console.log(`Found ${candidates.length} candidates in pool.`);
+
                     const selection = randomExercise(candidates.length ? candidates : pool);
 
                     if (selection) {
+                        console.log(`Selected: ${selection.exercise_name} (ID: ${selection.exercise_id})`);
                         usedIds.add(selection.exercise_id);
                         return selection;
                     }
-                    return { exercise_name: "Generic Exercise", exercise_id: 0 }; // Ultimate fallback
+
+                    console.error(`!!! FAILED TO SELECT for slot: ${slot}. Using fallback.`);
+                    return { exercise_name: "Generic Exercise", exercise_id: 0 };
                 });
             };
 
@@ -116,22 +122,23 @@ const generate = async (req, res) => {
 
                 return res.status(201).json({
                     success: true,
-                    data: {
-                        plan: {
+                    data: [
+                        {
+                            plan_id: plan_id,
+                            workout_name: workout_name,
                             goal: goal,
-                            level: level,
-                        },
-                        days: [
-                            {
-                                day_number: 1,
-                                exercises: day1_plan
-                            },
-                            {
-                                day_number: 2,
-                                exercises: day2_plan
-                            }
-                        ]
-                    }
+                            days: [
+                                {
+                                    day_number: 1,
+                                    exercises: day1_plan
+                                },
+                                {
+                                    day_number: 2,
+                                    exercises: day2_plan
+                                }
+                            ]
+                        }
+                    ]
                 });
 
 
@@ -157,47 +164,60 @@ const getPlans = async (req, res) => {
 
     try {
         const sql = `
-            SELECT p.workout_name, p.goal, d.day_number, d.day_id, 
+            SELECT p.plan_id, p.workout_name, p.goal, d.day_number, d.day_id,
                    el.exercise_name, el.muscle_target, ex.exercise_order
             FROM workout_plans p
             JOIN workout_days d ON p.plan_id = d.plan_id
             JOIN day_exercises ex ON d.day_id = ex.day_id
             JOIN exercise_list el ON ex.exercise_id = el.exercise_id
             WHERE p.profile_id = ? AND p.active = 1
-            ORDER BY d.day_number, ex.exercise_order`;
+            ORDER BY p.plan_id, d.day_number, ex.exercise_order`; // Order by plan_id first
 
         const [rows] = await db_pool.execute(sql, [profile_id]);
 
         if (rows.length === 0) {
-            return res.status(404).json({ message: "No active plan found" });
+            return res.status(200).json({ success: true, data: [] }); // Return empty array instead of 404
         }
 
-        const plan = {
-            workout_name: rows[0].workout_name,
-            goal: rows[0].goal,
-            days: []
-        };
+        const plans = [];
 
         rows.forEach(row => {
+            // 1. Find or Create the Plan
+            let plan = plans.find(p => p.plan_id === row.plan_id);
+            if (!plan) {
+                plan = {
+                    plan_id: row.plan_id,
+                    workout_name: row.workout_name,
+                    goal: row.goal,
+                    days: []
+                };
+                plans.push(plan);
+            }
+
+            // 2. Find or Create the Day inside that Plan
             let day = plan.days.find(d => d.day_number === row.day_number);
             if (!day) {
                 day = { day_number: row.day_number, exercises: [] };
                 plan.days.push(day);
             }
+
+            // 3. Add the Exercise to that Day
             day.exercises.push({
-                name: row.exercise_name,
-                target: row.muscle_target,
-                order: row.exercise_order
+                exercise_name: row.exercise_name,
+                muscle_target: row.muscle_target,
+                category: "Strength" // You can eventually pull this from the DB too
             });
         });
 
-        res.status(200).json(plan);
+        // Return the array of plans
+        res.status(200).json({
+            success: true,
+            data: plans
+        });
 
     } catch (error) {
-        res.status(500).json({ error: `${error}` });
+        res.status(500).json({ success: false, error: `${error}` });
     }
 };
 
 export { generate, getPlans };
-
-
