@@ -7,7 +7,7 @@
     android:background="#F5F5F5"
     android:padding="20dp">
 
-    <!-- X button -->
+    <!-- x button -->
     <ImageView
         android:id="@+id/closeButton"
         android:layout_width="40dp"
@@ -21,19 +21,18 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- Page title -->
     <TextView
         android:id="@+id/membershipTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Membership"
+        android:text="Memberships"
         android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <!-- Free Plan Card -->
+    <!-- Base plan card -->
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/freePlanCard"
         android:layout_width="0dp"
@@ -78,9 +77,7 @@
                 android:layout_height="wrap_content"
                 android:text="✔ Basic account features"/>
 
-            <!-- Free plan current label -->
             <TextView
-                android:id="@+id/freePlanLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Current Plan"
@@ -89,9 +86,11 @@
                 android:layout_marginTop="12dp"/>
 
         </LinearLayout>
+
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Premium Plan Card -->
+    <!-- premium plan card -->
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/premiumPlanCard"
         android:layout_width="0dp"
@@ -134,24 +133,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="✔ Product Recommendations"/>
+                android:text="✔ ???"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="✔ Full forum features"/>
+                android:text="✔ ???"/>
 
-            <!-- Premium plan current label -->
-            <TextView
-                android:id="@+id/premiumPlanLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="#26A69A"
-                android:textStyle="bold"
-                android:layout_marginTop="12dp"/>
-
-            <!-- Upgrade button -->
             <Button
                 android:id="@+id/upgradeButton"
                 android:layout_width="match_parent"
@@ -162,6 +150,7 @@
                 android:textColor="@android:color/white"/>
 
         </LinearLayout>
+
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
