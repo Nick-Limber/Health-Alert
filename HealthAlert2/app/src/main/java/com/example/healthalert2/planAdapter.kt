@@ -1,5 +1,6 @@
 package com.example.healthalert2
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,9 +8,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.healthalert2.data.network.WorkoutPlan
-import android.util.Log
-class PlanAdapter(private var plans: List<WorkoutPlan>) :
+import com.example.healthalert2.data.network.WorkoutData // Corrected Import
+class PlanAdapter(private var plans: List<WorkoutData>) :
     RecyclerView.Adapter<PlanAdapter.PlanViewHolder>() {
 
     class PlanViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -26,25 +26,27 @@ class PlanAdapter(private var plans: List<WorkoutPlan>) :
     }
 
     override fun onBindViewHolder(holder: PlanViewHolder, position: Int) {
-        val plan = plans[position]
-        holder.tvPlanName.text = plan.workoutName
-        holder.tvPlanGoal.text = "Goal: ${plan.goal}"
+        val workoutData = plans[position]
 
+        // FIX: Access workoutData.workoutName and workoutData.goal directly
+        holder.tvPlanName.text = workoutData.workoutName ?: "Custom Plan"
+        holder.tvPlanGoal.text = "Goal: ${workoutData.goal}"
 
-        val dayAdapter = DayAdapter(plan.days)
+        // Setup nested RecyclerView
+        val dayAdapter = DayAdapter(workoutData.days)
         holder.rvDays.layoutManager = LinearLayoutManager(holder.itemView.context)
         holder.rvDays.adapter = dayAdapter
 
         holder.planHeader.setOnClickListener {
             val isExpanded = holder.rvDays.visibility == View.VISIBLE
             holder.rvDays.visibility = if (isExpanded) View.GONE else View.VISIBLE
-
             holder.ivArrow.rotation = if (isExpanded) 0f else 180f
         }
     }
-    fun updateData(newPlans: List<WorkoutPlan>) {
+
+    fun updateData(newPlans: List<WorkoutData>) {
         this.plans = newPlans
-        Log.d("ADAPTER_DEBUG", "Received ${newPlans.size} plans")
+        Log.d("ADAPTER_DEBUG", "Adapter updated with ${newPlans.size} plan(s)")
         notifyDataSetChanged()
     }
 
