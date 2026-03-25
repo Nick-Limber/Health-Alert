@@ -21,7 +21,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/authentication", authenticationRoutes);
 app.use("/posts", postsRoutes);
 app.use("/recommendation", recommendationRoutes);
-
 const server = app.listen(PORT, "0.0.0.0", () => {
     console.log(`server running on PORT ${PORT}`);
 });
