@@ -1,19 +1,17 @@
 import mysql from "mysql2/promise";
-import { config } from "dotenv";
-//Added for pem file
-import fs from "fs";
 //makes csPath work
 import path from "path";
 
-config();
+//config();
 
-const caPath = path.resolve("./certs/ca.pem"); //path from backend folder
+//const caPath = path.resolve("./certs/ca.pem"); //path from backend folder
 const db_pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    port: Number(process.env.DB_PORT) || 11092,
+    //added
+    port:process.env.DB_PORT,
     waitForConnections: true,
     connectionLimit: 10,
     enableKeepAlive: true,        // Prevents the "Reset" error you saw

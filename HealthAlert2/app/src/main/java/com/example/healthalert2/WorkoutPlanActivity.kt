@@ -101,6 +101,12 @@ class WorkoutPlanActivity : AppCompatActivity() {
                     true
                 }
 
+                R.id.nav_past_data -> {
+                    val intent = Intent(this, ViewPastDataActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
                 else -> false
             }
         }

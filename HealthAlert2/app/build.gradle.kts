@@ -73,6 +73,8 @@ dependencies {
 
     implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+    //nick - added to call volley for connection
+    implementation("com.android.volley:volley:1.2.1")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
 
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")

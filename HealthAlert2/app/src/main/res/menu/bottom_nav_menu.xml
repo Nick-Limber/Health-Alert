@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/nav_home"
         android:icon="@android:drawable/ic_menu_view"
@@ -18,4 +19,8 @@
         android:id="@id/workout_plan"
         android:icon="@android:drawable/ic_menu_myplaces"
         android:title="Plan"/>
+    <item
+        android:id="@+id/nav_past_data"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="View Past Data"/>
 </menu>
