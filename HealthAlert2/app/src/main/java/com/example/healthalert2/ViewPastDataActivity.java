@@ -1,6 +1,8 @@
 package com.example.healthalert2;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -11,6 +13,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,20 +25,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/*import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;*/
-
 public class ViewPastDataActivity extends AppCompatActivity {
 
     private LineGraph graph;
     private ListView weightList;
     private ListView nutritionList;
     private ListView workoutList;
-
-    //private OkHttpClient client = new OkHttpClient(); // HTTP client
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +42,12 @@ public class ViewPastDataActivity extends AppCompatActivity {
         nutritionList = findViewById(R.id.nutritionList);
         workoutList = findViewById(R.id.workoutList);
 
+        //set up nav bar
+        setUpNavBar();
+
         //temp data
         //showSampleData();
+
         fetchPastDataFromBackend();
     }
 
@@ -114,6 +113,36 @@ public class ViewPastDataActivity extends AppCompatActivity {
                 this, android.R.layout.simple_list_item_1,workoutStrings
         ));
     }*/
+
+    private void setUpNavBar() {
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
+        bottomNav.setSelectedItemId(R.id.nav_past_data);
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_home) {
+                Intent intent = new Intent(this, HomePage.class);
+
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+                return true;
+            } else if (id == R.id.nav_forum) {
+                Intent intent = new Intent(this, CommunityForumActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+                return true;
+            } else if (id == R.id.nav_account) {
+                Intent intent = new Intent(this, AccountPage.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+                return true;
+            } else if (id == R.id.nav_past_data) {
+                return false;
+            }
+            return false;
+        });
+    }
 
     private void fetchPastDataFromBackend() {
         int loggedInUserId = 1;
