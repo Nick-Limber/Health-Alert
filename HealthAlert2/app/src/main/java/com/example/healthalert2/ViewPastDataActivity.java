@@ -3,6 +3,8 @@ package com.example.healthalert2;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Request;
@@ -14,7 +16,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -107,7 +108,8 @@ public class ViewPastDataActivity extends AppCompatActivity {
     }*/
 
     private void fetchPastDataFromBackend() {
-        String url = "http://10.0.2.2:5001/health/pastdata"; //backend endpoint
+        int loggedInUserId = 1;
+        String url = "http://10.0.2.2:5005/health/pastdata?profile_id=" + loggedInUserId; //backend endpoint
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -126,23 +128,14 @@ public class ViewPastDataActivity extends AppCompatActivity {
                             JSONObject entry = weightArray.getJSONObject(i);
 
                             float weight = (float) entry.getDouble("weight");
-                            String rawTime = entry.getString("recordAt");
+                            String rawTime = entry.getString("recorded_at");
+
+                            String cleanDate = formatDate(rawTime);
 
                             weightValues.add(weight);
-                            weightTimeStamps.add(rawTime);
+                            weightTimeStamps.add(cleanDate);
 
-                            //format date
-                            String day;
-                            try {
-                                SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd");
-                                Date date = dbFormat.parse(rawTime);
-                                day = displayFormat.format((date));
-                            } catch (Exception e) {
-                                day = rawTime;
-                            }
-
-                            weightLabels.add(day + ": " + weight + " lbs");
+                            weightLabels.add(cleanDate + ": " + weight + " lbs");
                         }
 
                         graph.setData(weightValues, weightTimeStamps);
@@ -161,10 +154,11 @@ public class ViewPastDataActivity extends AppCompatActivity {
                             JSONObject entry = nutritionArray.getJSONObject(i);
 
                             nutritionStrings.add(
-                                    entry.getString("recordAt") + " - " +
+                                    formatDate(entry.getString("recorded_at")) + " - " +
+                                            entry.getString("diet_name") + " - " +
                                             entry.getInt("calories") + " cals - " +
                                             entry.getInt("protein") + "g protein - " +
-                                            entry.getInt("carbs") + "g carbs"
+                                            entry.getInt("carbohydrates") + "g carbs"
                             );
                         }
 
@@ -182,7 +176,8 @@ public class ViewPastDataActivity extends AppCompatActivity {
                             JSONObject entry = workoutArray.getJSONObject(i);
 
                             workoutStrings.add(
-                                    entry.getString("exercise_type") + " - " +
+                                    formatDate(entry.getString("recorded_at")) + " - " +
+                                            entry.getString("exercise_type") + " - " +
                                             entry.getInt("sets") + "x" +
                                             entry.getInt("reps") + " - " +
                                             entry.getInt("weight") + " lbs"
@@ -196,10 +191,30 @@ public class ViewPastDataActivity extends AppCompatActivity {
                         ));
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        android.widget.Toast.makeText(ViewPastDataActivity.this, "JSON Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 },
-                error -> error.printStackTrace()
+                error -> {
+                    error.printStackTrace();
+                    android.widget.Toast.makeText(ViewPastDataActivity.this, "Network Error", Toast.LENGTH_LONG).show();
+                }
+
         );
         queue.add(request);
+    }
+
+    private String formatDate(String rawTime)
+    {
+        try {
+            SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            dbFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+
+            SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd");
+
+            Date date = dbFormat.parse(rawTime);
+            return displayFormat.format(date);
+        }catch (Exception e) {
+            return rawTime.split("T")[0];
+        }
     }
 }

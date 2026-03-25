@@ -1,6 +1,7 @@
 package com.example.healthalert2
 
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -12,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.widget.Toast
+import android.content.Intent
 
 class LoginPage : AppCompatActivity() {
 
@@ -50,6 +52,7 @@ class LoginPage : AppCompatActivity() {
 
             Toast.makeText(this, "Logged in!", Toast.LENGTH_SHORT).show()
         }
+
 
         // Bottom Navigation setup
 

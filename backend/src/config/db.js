@@ -7,7 +7,7 @@ import path from "path";
 
 config();
 
-const caPath = path.resolve("./certs/ca.pem"); //path from backend folder
+//const caPath = path.resolve("./certs/ca.pem"); //path from backend folder
 const db_pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -19,7 +19,8 @@ const db_pool = mysql.createPool({
     connectionLimit: 10,
     // Added path to CA certificate file (PEM)
     ssl: {
-            ca: fs.readFileSync(caPath)
+            //ca: fs.readFileSync(caPath),
+            rejectUnauthorized: false
         }
 });
 

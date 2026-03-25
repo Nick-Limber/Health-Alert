@@ -32,6 +32,9 @@
         <activity
             android:name=".LoginPage"
             android:exported="false" />
+        <activity
+            android:name=".ViewPastDataActivity"
+            android:exported="false"/>
         <!--<activity
             android:name=".MainActivity2"
             android:exported="false" />
