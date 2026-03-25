@@ -46,31 +46,33 @@ class WorkoutPlanActivity : AppCompatActivity() {
 
         viewModel.activePlansResult.observe(this) { response ->
             if (response != null && response.success) {
-                Log.d("ADAPTER_DEBUG", "Received ${response.data.size} plans")
+                val planList = response.data // This is now a List<WorkoutData>
 
-                planAdapter.updateData(response.data)
+                // Log the number of plans received
+                Log.d("ADAPTER_DEBUG", "Received ${planList.size} plans")
 
-                // If a new plan was just added, scroll to the bottom automatically
-                if (response.data.isNotEmpty()) {
+                planAdapter.updateData(planList)
+
+                // Smooth scroll to the newest plan (the last one in the list)
+                if (planList.isNotEmpty()) {
                     recyclerView.postDelayed({
-                        recyclerView.smoothScrollToPosition(response.data.size - 1)
-                    }, 300) // Small delay to allow the adapter to finish drawing
+                        val lastIndex = planList.size - 1
+                        recyclerView.smoothScrollToPosition(lastIndex)
+                    }, 300)
                 }
             } else {
                 Log.e("API_ERROR", "Failed to load plans or response was null")
             }
         }
-
         findViewById<FloatingActionButton>(R.id.fabGenerate).setOnClickListener {
             val bottomSheet = GeneratePlanBottomSheet { request ->
-                // This calls the ViewModel function we updated with the hardcoded ID
                 viewModel.generateNewPlan(request)
                 Toast.makeText(this, "Generating your plan...", Toast.LENGTH_SHORT).show()
             }
             bottomSheet.show(supportFragmentManager, "GeneratePlanSheet")
         }
 
-        viewModel.fetchPlans(5)
+        viewModel.fetchPlans(7)
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNav.setOnItemSelectedListener {

@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.widget.Toast
-import com.example.healthalert2.data.network.WorkoutPlan
 
 class HomePage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
