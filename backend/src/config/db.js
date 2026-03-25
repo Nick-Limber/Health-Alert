@@ -1,11 +1,8 @@
 import mysql from "mysql2/promise";
-import { config } from "dotenv";
-//Added for pem file
-import fs from "fs";
 //makes csPath work
 import path from "path";
 
-config();
+//config();
 
 //const caPath = path.resolve("./certs/ca.pem"); //path from backend folder
 const db_pool = mysql.createPool({
@@ -14,7 +11,7 @@ const db_pool = mysql.createPool({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     //added
-    port: Number(process.env.DB_PORT) || 11092,
+    port:process.env.DB_PORT,
     waitForConnections: true,
     connectionLimit: 10,
     // Added path to CA certificate file (PEM)

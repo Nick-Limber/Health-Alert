@@ -6,6 +6,7 @@ const router = express.Router();
 router.get("/pastdata", async (req, res) => {
     try {
         const profileId = req.query.profile_id;
+        console.log("--New REQUEST FOR PROFILE_ID:", profileId);
 
         if(!profileId)
         {
@@ -61,8 +62,9 @@ router.get("/pastdata", async (req, res) => {
         });
     }
     catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Database Error"});
+        console.log("❌ ERROR IN HEALTH ROUTE:");
+        console.error(err); // This prints the full red error in the terminal
+        res.status(500).send("Database Error: " + err.message);
     }
 
 });
