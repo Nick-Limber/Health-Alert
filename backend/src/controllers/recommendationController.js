@@ -176,13 +176,12 @@ const getPlans = async (req, res) => {
         const [rows] = await db_pool.execute(sql, [profile_id]);
 
         if (rows.length === 0) {
-            return res.status(200).json({ success: true, data: [] }); // Return empty array instead of 404
+            return res.status(200).json({ success: true, data: [] });
         }
 
         const plans = [];
 
         rows.forEach(row => {
-            // 1. Find or Create the Plan
             let plan = plans.find(p => p.plan_id === row.plan_id);
             if (!plan) {
                 plan = {
@@ -194,22 +193,19 @@ const getPlans = async (req, res) => {
                 plans.push(plan);
             }
 
-            // 2. Find or Create the Day inside that Plan
             let day = plan.days.find(d => d.day_number === row.day_number);
             if (!day) {
                 day = { day_number: row.day_number, exercises: [] };
                 plan.days.push(day);
             }
 
-            // 3. Add the Exercise to that Day
             day.exercises.push({
                 exercise_name: row.exercise_name,
                 muscle_target: row.muscle_target,
-                category: "Strength" // You can eventually pull this from the DB too
+                category: "Strength"
             });
         });
 
-        // Return the array of plans
         res.status(200).json({
             success: true,
             data: plans
