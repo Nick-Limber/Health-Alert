@@ -31,7 +31,6 @@ const register = async (req, res) => {
 
         const token = generateToken(result.insertID);
 
-
         res.status(201).json({
             status: "success",
             data: {
@@ -49,9 +48,8 @@ const register = async (req, res) => {
     }
 }
 
-
-
 const login = async (req, res) => {
+
     const { email, password } = req.body;
 
     try {
@@ -69,7 +67,7 @@ const login = async (req, res) => {
             return res.status(401).json({ error: "invalid email or password" });
         }
 
-        const token = generateToken(rows[0].userID);
+        const token = generateToken(rows[0].profile_id);
 
         res.status(201).json({
             status: "succcess",
@@ -81,12 +79,9 @@ const login = async (req, res) => {
                 token,
             },
         });
-
-
     }
     catch (error) {
         res.status(500).json({ error: `${error}` });
     }
 }
-
 export { register, login };

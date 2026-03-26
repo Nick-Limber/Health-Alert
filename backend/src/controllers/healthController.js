@@ -1,5 +1,5 @@
 import { db_pool } from "../config/db.js";
- 
+
 export const getPastData = async (req, res) => {
     try {
         const [rows] = await db_pool.querey(
@@ -9,7 +9,6 @@ export const getPastData = async (req, res) => {
     }
     catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Database Error"});
+        res.status(500).json({ message: "Database Error" });
     }
-    
 };

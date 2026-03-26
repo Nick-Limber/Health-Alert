@@ -1,8 +1,11 @@
 import "./loadEnv.js";
 import { config } from "dotenv";
-
+import cors from 'cors';
 import express from "express"
 import { close_pool, db_pool } from "./config/db.js";
+
+// IMPORT MIDDLEWARE
+import { verificationMiddleware } from "./middleware/verificationMiddleware.js";
 
 // IMPORT ROUTES
 import healthRoutes from "./routes/healthRoutes.js";
@@ -22,13 +25,23 @@ app.get("/test", (req, res) => {
     res.send("Server is alive!");
 });
 
-// MIDDLEWARE
+// BASIC MIDDLEWARE
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+    origin: '*', // Allows your emulator to connect
+    allowedHeaders: ['Content-Type', 'Authorization'], // 👈 Crucial: Allow the Auth header
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
+
+// AUTHENTICATION ROUTE
+app.use("/authentication", authenticationRoutes);
+
+// VERIFICATION MIDDLEWARE
+app.use(verificationMiddleware)
 
 // API ROUTES
 app.use("/health", healthRoutes);
-app.use("/authentication", authenticationRoutes);
 app.use("/posts", postsRoutes);
 app.use("/recommendation", recommendationRoutes);
 
