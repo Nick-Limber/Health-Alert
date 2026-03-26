@@ -69,7 +69,7 @@ const login = async (req, res) => {
             return res.status(401).json({ error: "invalid email or password" });
         }
 
-        const token = generateToken(rows[0].userID);
+        const token = generateToken(rows[0].profile_id);
 
         res.status(201).json({
             status: "succcess",

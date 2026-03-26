@@ -160,7 +160,7 @@ const generate = async (req, res) => {
 }
 
 const getPlans = async (req, res) => {
-    const profile_id = parseInt(req.query.profile_id);
+    const profile_id = req.user;
 
     try {
         const sql = `
