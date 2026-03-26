@@ -1,4 +1,5 @@
 import "./loadEnv.js";
+import { config } from "dotenv";
 
 import express from "express"
 import { close_pool, db_pool } from "./config/db.js";
@@ -10,6 +11,8 @@ import postsRoutes from "./routes/postsRoutes.js";
 import recommendationRoutes from "./routes/recommendationRoutes.js";
 
 // ADD ENV VARIABLES AND CONNECT TO DB
+
+config();
 
 const app = express();
 const PORT = 5005;
