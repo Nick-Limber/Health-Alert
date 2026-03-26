@@ -3,6 +3,7 @@ package com.example.healthalert2
 import android.content.Intent
 import android.media.Image
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
@@ -16,6 +17,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val authToken = prefs.getString("auth_token", null)
+
+        if (!authToken.isNullOrBlank()) {
+            Log.d("AUTH_CHECK", "Token found, skipping login.")
+
+            val intent = Intent(this, HomePage::class.java)
+            startActivity(intent)
+
+            finish()
+            return
+        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
