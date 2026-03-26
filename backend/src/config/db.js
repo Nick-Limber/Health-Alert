@@ -3,7 +3,6 @@ import fs from "fs";
 import path from "path";
 import { config } from "dotenv";
 
-
 config();
 
 const caPath = path.join(process.cwd(), "certs", "ca.pem"); // Looks in the root /certs folder

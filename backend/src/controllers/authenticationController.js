@@ -31,7 +31,6 @@ const register = async (req, res) => {
 
         const token = generateToken(result.insertID);
 
-
         res.status(201).json({
             status: "success",
             data: {
@@ -49,9 +48,8 @@ const register = async (req, res) => {
     }
 }
 
-
-
 const login = async (req, res) => {
+
     const { email, password } = req.body;
 
     try {
@@ -81,12 +79,9 @@ const login = async (req, res) => {
                 token,
             },
         });
-
-
     }
     catch (error) {
         res.status(500).json({ error: `${error}` });
     }
 }
-
 export { register, login };
