@@ -28,11 +28,7 @@ app.get("/test", (req, res) => {
 // BASIC MIDDLEWARE
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-    origin: '*', // Allows your emulator to connect
-    allowedHeaders: ['Content-Type', 'Authorization'], // 👈 Crucial: Allow the Auth header
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
-}));
+
 
 // AUTHENTICATION ROUTE
 app.use("/authentication", authenticationRoutes);
@@ -44,6 +40,7 @@ app.use(verificationMiddleware)
 app.use("/health", healthRoutes);
 app.use("/posts", postsRoutes);
 app.use("/recommendation", recommendationRoutes);
+
 
 const server = app.listen(PORT, "0.0.0.0", () => {
     console.log(`server running on PORT ${PORT}`);
