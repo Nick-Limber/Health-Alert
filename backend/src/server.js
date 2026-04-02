@@ -18,7 +18,7 @@ import recommendationRoutes from "./routes/recommendationRoutes.js";
 config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5005;
 
 app.get("/test", (req, res) => {
     console.log("Testing server connectivity...");
