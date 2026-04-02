@@ -39,6 +39,11 @@ app.use(verificationMiddleware)
 // API ROUTES
 app.use("/health", healthRoutes);
 app.use("/posts", postsRoutes);
+app.use(cors({
+    origin: '*', // Allows your emulator to connect
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
 app.use("/recommendation", recommendationRoutes);
 
 
