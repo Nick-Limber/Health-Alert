@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/server.js"
   },
@@ -20,7 +20,12 @@
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.19.1"
   },
+  "engines": {
+    "node": "25.3.0"
+  },
   "devDependencies": {
-    "nodemon": "^3.1.13"
+    "@types/node": "^25.5.0",
+    "nodemon": "^3.1.13",
+    "undici-types": "^7.18.2"
   }
 }
