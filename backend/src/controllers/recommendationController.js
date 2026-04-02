@@ -160,7 +160,6 @@ const generate = async (req, res) => {
 }
 
 const getPlans = async (req, res) => {
-    const profile_id = req.user;
 
     try {
         const sql = `
