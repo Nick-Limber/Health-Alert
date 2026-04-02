@@ -17,7 +17,7 @@ const db_pool = mysql.createPool({
     enableKeepAlive: true,        // Prevents the "Reset" error you saw
     keepAliveInitialDelay: 10000, // Sends a "ping" every 10 seconds
     ssl: {
-        ca: fs.readFileSync(caPath),
+        ca: fs.readFileSync(Path),
         rejectUnauthorized: true  // Ensures the cert is strictly validated
     }
 });
