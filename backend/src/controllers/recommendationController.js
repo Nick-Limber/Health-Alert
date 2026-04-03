@@ -161,6 +161,8 @@ const generate = async (req, res) => {
 
 const getPlans = async (req, res) => {
 
+    const profile_id = req.user;
+
     try {
         const sql = `
             SELECT p.plan_id, p.workout_name, p.goal, d.day_number, d.day_id,
@@ -170,7 +172,7 @@ const getPlans = async (req, res) => {
             JOIN day_exercises ex ON d.day_id = ex.day_id
             JOIN exercise_list el ON ex.exercise_id = el.exercise_id
             WHERE p.profile_id = ? AND p.active = 1
-            ORDER BY p.plan_id, d.day_number, ex.exercise_order`; // Order by plan_id first
+            ORDER BY p.plan_id, d.day_number, ex.exercise_order`;
 
         const [rows] = await db_pool.execute(sql, [profile_id]);
 
@@ -205,7 +207,7 @@ const getPlans = async (req, res) => {
             });
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             data: plans
         });
