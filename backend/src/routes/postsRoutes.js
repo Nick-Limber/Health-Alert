@@ -68,4 +68,41 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
+// GET all replies for a post
+router.get("/:postId/replies", async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const [rows] = await db_pool.query(
+            "SELECT * FROM replies WHERE postId = ? ORDER BY timestamp ASC",
+            [postId]
+        );
+        res.json(rows);
+    } catch (error) {
+        console.error("REPLY GET ERROR:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// CREATE a reply for a post
+router.post("/:postId/replies", async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const { userId, content } = req.body;
+
+        if (!userId || !content) {
+            return res.status(400).json({ message: "Missing userId or content" });
+        }
+
+        const [result] = await db_pool.query(
+            "INSERT INTO replies (postId, userId, content) VALUES (?, ?, ?)",
+            [postId, userId, content]
+        );
+
+        res.status(201).json({ message: "Reply added", replyId: result.insertId });
+    } catch (error) {
+        console.error("REPLY POST ERROR:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export default router;
