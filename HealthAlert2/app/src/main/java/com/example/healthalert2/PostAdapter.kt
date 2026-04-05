@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.*
 
 class PostAdapter(
     private var postList: MutableList<Post>,
@@ -45,7 +47,7 @@ class PostAdapter(
         // Display post content
         holder.tvTitle.text = post.title
         holder.tvContent.text = post.content
-        holder.tvTimestamp.text = post.timestamp
+        holder.tvTimestamp.text = getTimeAgo(post.timestamp)
 
         // Edit post on long click
         holder.itemView.setOnLongClickListener {
@@ -106,7 +108,7 @@ class PostAdapter(
                     override fun onResponse(call: Call<List<Reply>>, response: Response<List<Reply>>) {
                         if (response.isSuccessful) {
                             val fetchedReplies = response.body() ?: emptyList()
-                            
+
                             // 1. Update local post data so it persists
                             val currentPos = holder.adapterPosition
                             if (currentPos != RecyclerView.NO_POSITION) {
@@ -175,7 +177,7 @@ class PostAdapter(
                     // Re-trigger the fetch to show the new reply
                     if (holder.repliesLayout.visibility == View.VISIBLE) {
                         // Refresh if already open
-                        holder.repliesLayout.visibility = View.GONE 
+                        holder.repliesLayout.visibility = View.GONE
                         holder.btnShowReplies.performClick()
                     } else {
                         // open it
@@ -190,5 +192,34 @@ class PostAdapter(
                 Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+    fun getTimeAgo(timestamp: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+            val past = inputFormat.parse(timestamp)?.time ?: return timestamp
+            val now = System.currentTimeMillis()
+
+            val diff = now - past
+
+            val seconds = diff / 1000
+            val minutes = seconds / 60
+            val hours = minutes / 60
+            val days = hours / 24
+
+            when {
+                seconds < 60 -> "Just now"
+                minutes < 60 -> "$minutes min ago"
+                hours < 24 -> "$hours hr ago"
+                days < 7 -> "$days day${if (days > 1) "s" else ""} ago"
+                else -> {
+                    val outputFormat = SimpleDateFormat("MMM d", Locale.getDefault())
+                    outputFormat.format(Date(past))
+                }
+            }
+        } catch (e: Exception) {
+            timestamp // fallback if parsing fails
+        }
     }
 }
