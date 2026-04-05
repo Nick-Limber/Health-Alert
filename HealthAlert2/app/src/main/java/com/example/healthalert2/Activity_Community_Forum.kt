@@ -14,83 +14,39 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+//allows users to browse posts
 class CommunityForumActivity : AppCompatActivity() {
 
-    //UI Components
     private lateinit var recyclerView: RecyclerView
     private lateinit var btnCreatePost: Button
-
-    //Data + Adapter
     private lateinit var postList: MutableList<Post>
     private lateinit var adapter: PostAdapter
 
-    // Handles result when returning from CreatePostActivity
+    private val currentUserId = 1 // TODO: Replace with real logged-in user ID
+
     private val createPostLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        //if user created/edited a post successfully
         if (result.resultCode == Activity.RESULT_OK) {
-            fetchPosts() // refresh after create or edit
+            fetchPosts()
         }
     }
 
-    // Fetch posts from backend (GET request)
-    fun fetchPosts() {
-        RetrofitInstance.api.getPosts().enqueue(object : Callback<List<Post>> {
-            override fun onResponse(call: Call<List<Post>>, response: Response<List<Post>>) {
-                if (response.isSuccessful) {
-                    // Get posts from response
-                    response.body()?.let { posts ->
-                        //Sort posts by newest first
-                        val sortedPosts = posts.sortedByDescending { it.timestamp }
-                        //update recyclerview with new data
-                        adapter.updatePosts(sortedPosts)
-                      //scroll to top if there are posts
-                        if (sortedPosts.isNotEmpty()) {
-                            recyclerView.scrollToPosition(0)
-                        }
-                    }
-                } else {
-                    //server responded but not successful
-                    Toast.makeText(
-                        this@CommunityForumActivity,
-                        "Failed to load posts",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-//runs if request failed
-            override fun onFailure(call: Call<List<Post>>, t: Throwable) {
-                Toast.makeText(
-                    this@CommunityForumActivity,
-                    "Error: ${t.message}",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        })
-    }
-
-    // Called when activity is first created
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_community_forum)
 
-        // connect UI elements from XML
         recyclerView = findViewById(R.id.recyclerViewPosts)
         btnCreatePost = findViewById(R.id.btnCreatePost)
 
-        // initialize empty list + adapter
         postList = mutableListOf()
-        adapter = PostAdapter(postList)
+        adapter = PostAdapter(postList, currentUserId)
 
-        //set recyclerview layout and attach adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
-        // Initial load when page opens
         fetchPosts()
 
-        // Create Post button
         btnCreatePost.setOnClickListener {
             val intent = Intent(this, CreatePostActivity::class.java)
             createPostLauncher.launch(intent)
@@ -98,30 +54,40 @@ class CommunityForumActivity : AppCompatActivity() {
 
         //NAVBAR SECTION
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-
         bottomNav.selectedItemId = R.id.nav_forum
-
         bottomNav.setOnItemSelectedListener {
             when (it.itemId) {
-
                 R.id.nav_home -> {
-                    val intent = Intent(this, HomePage::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, HomePage::class.java))
                     true
                 }
-
-                R.id.nav_forum -> {
-                    true // already on community forum page
-                }
-
+                R.id.nav_forum -> true 
                 R.id.nav_account -> {
-                    val intent = Intent(this, AccountPage::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, AccountPage::class.java))
                     true
                 }
-
                 else -> false
             }
         }
+    }
+
+    private fun fetchPosts() {
+        RetrofitInstance.api.getPosts().enqueue(object : Callback<List<Post>> {
+            override fun onResponse(call: Call<List<Post>>, response: Response<List<Post>>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { posts ->
+                        val sortedPosts = posts.sortedByDescending { it.timestamp }
+                        adapter.updatePosts(sortedPosts)
+                        if (sortedPosts.isNotEmpty()) recyclerView.scrollToPosition(0)
+                    }
+                } else {
+                    Toast.makeText(this@CommunityForumActivity, "Failed to load posts", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<Post>>, t: Throwable) {
+                Toast.makeText(this@CommunityForumActivity, "Error: ${t.message}", Toast.LENGTH_LONG).show()
+            }
+        })
     }
 }

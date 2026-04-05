@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.healthalert2.data.network.WorkoutPlan
-import android.util.Log
+
 class PlanAdapter(private var plans: List<WorkoutPlan>) :
     RecyclerView.Adapter<PlanAdapter.PlanViewHolder>() {
 
@@ -44,7 +44,6 @@ class PlanAdapter(private var plans: List<WorkoutPlan>) :
     }
     fun updateData(newPlans: List<WorkoutPlan>) {
         this.plans = newPlans
-        Log.d("ADAPTER_DEBUG", "Received ${newPlans.size} plans")
         notifyDataSetChanged()
     }
 
