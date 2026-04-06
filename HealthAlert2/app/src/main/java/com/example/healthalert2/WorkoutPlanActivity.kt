@@ -60,7 +60,6 @@ class WorkoutPlanActivity : AppCompatActivity() {
                 }
             } else {
                 Log.e("API_ERROR", "Failed to load plans or unauthorized")
-                // If it's a 401 error, you might want to force a logout here
             }
         }
 

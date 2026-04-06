@@ -28,7 +28,6 @@ class PlanAdapter(private var plans: List<WorkoutData>) :
     override fun onBindViewHolder(holder: PlanViewHolder, position: Int) {
         val workoutData = plans[position]
 
-        // FIX: Access workoutData.workoutName and workoutData.goal directly
         holder.tvPlanName.text = workoutData.workoutName ?: "Custom Plan"
         holder.tvPlanGoal.text = "Goal: ${workoutData.goal}"
 

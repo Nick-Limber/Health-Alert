@@ -19,7 +19,6 @@ class WorkoutViewModel(private val repository: GenerateWorkoutRepository) : View
     val isLoading = MutableLiveData<Boolean>(false)
     val errorMessage = MutableLiveData<String?>()
 
-    // 1. Pass the token here from the Activity
     fun generateNewPlan(token: String, request: GeneratePlanRequest) {
         viewModelScope.launch {
             isLoading.value = true
@@ -30,7 +29,7 @@ class WorkoutViewModel(private val repository: GenerateWorkoutRepository) : View
                 val response = repository.getWorkoutPlan(authHeader, request)
 
                 if (response.isSuccessful) {
-                    // Refresh the plans using the same token
+                    Log.d("FLOW_DEBUG", "1. Plan created successfully on backend")
                     fetchPlans(token)
                 } else {
                     errorMessage.value = "Server Error: ${response.code()}"
@@ -44,7 +43,6 @@ class WorkoutViewModel(private val repository: GenerateWorkoutRepository) : View
         }
     }
 
-    // 2. Updated to use the Token string
     fun fetchPlans(token: String) {
         viewModelScope.launch {
             isLoading.value = true
