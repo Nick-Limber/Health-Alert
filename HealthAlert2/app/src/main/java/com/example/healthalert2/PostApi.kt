@@ -9,22 +9,33 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface PostApi {
-    //Sends request to backend for posts
+    // Sends request to backend for posts
     @GET("posts")
     fun getPosts(): Call<List<Post>>
 
-    //sends new post data as JSON to be inserted into MySQL
+    // Sends new post data as JSON to be inserted into MySQL
     @POST("posts")
     fun createPost(@Body post: CreatePostRequest): Call<Map<String, Any>>
 
-    //to edit post
+    // To edit post
     @PUT("posts/{id}")
     fun updatePost(
         @Path("id") id: Int,
         @Body post: Post
     ): Call<Void>
 
-    //to delete post
+    // To delete post
     @DELETE("posts/{id}")
     fun deletePost(@Path("id") postId: Int): Call<Void>
+
+    // To send a reply to a post
+    @POST("posts/{postId}/replies")
+    fun sendReply(
+        @Path("postId") postId: Int,
+        @Body request: CreateReplyRequest
+    ): Call<Void>
+    
+    // To fetch all replies for a specific post
+    @GET("posts/{postId}/replies")
+    fun getReplies(@Path("postId") postId: Int): Call<List<Reply>>
 }

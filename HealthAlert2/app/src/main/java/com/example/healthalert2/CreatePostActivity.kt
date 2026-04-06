@@ -59,7 +59,7 @@ class CreatePostActivity : AppCompatActivity() {
 
             if (isEditMode) {
                 // Edit mode -> UPDATE EXISITING POST
-                val updatedPost = Post(postId, 1, title, content, "")
+                val updatedPost = Post(postId, title, content, "", emptyList())
                 RetrofitInstance.api.updatePost(postId, updatedPost).enqueue(object : Callback<Void> {
                     // if backend responds
                     override fun onResponse(call: Call<Void>, response: Response<Void>) {
