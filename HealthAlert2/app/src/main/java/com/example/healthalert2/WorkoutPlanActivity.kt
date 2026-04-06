@@ -1,5 +1,6 @@
 package com.example.healthalert2
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -46,14 +47,11 @@ class WorkoutPlanActivity : AppCompatActivity() {
 
         viewModel.activePlansResult.observe(this) { response ->
             if (response != null && response.success) {
-                val planList = response.data // This is now a List<WorkoutData>
-
-                // Log the number of plans received
+                val planList = response.data
                 Log.d("ADAPTER_DEBUG", "Received ${planList.size} plans")
 
                 planAdapter.updateData(planList)
 
-                // Smooth scroll to the newest plan (the last one in the list)
                 if (planList.isNotEmpty()) {
                     recyclerView.postDelayed({
                         val lastIndex = planList.size - 1
@@ -61,55 +59,71 @@ class WorkoutPlanActivity : AppCompatActivity() {
                     }, 300)
                 }
             } else {
-                Log.e("API_ERROR", "Failed to load plans or response was null")
+                Log.e("API_ERROR", "Failed to load plans or unauthorized")
             }
         }
+
         findViewById<FloatingActionButton>(R.id.fabGenerate).setOnClickListener {
             val bottomSheet = GeneratePlanBottomSheet { request ->
-                viewModel.generateNewPlan(request)
-                Toast.makeText(this, "Generating your plan...", Toast.LENGTH_SHORT).show()
+
+                val token = getSavedToken()
+
+                if (token != null) {
+                    viewModel.generateNewPlan(token, request)
+                    Toast.makeText(this, "Generating your plan...", Toast.LENGTH_SHORT).show()
+                } else {
+                    redirectToLogin()
+                }
             }
             bottomSheet.show(supportFragmentManager, "GeneratePlanSheet")
         }
 
-        viewModel.fetchPlans(7)
+        val token = getSavedToken()
+        if (token != null) {
+            viewModel.fetchPlans(token)
+        } else {
+            redirectToLogin()
+        }
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        bottomNav.selectedItemId = R.id.workout_plan // Ensure correct item is highlighted
+
         bottomNav.setOnItemSelectedListener {
             when(it.itemId) {
-
                 R.id.nav_home -> {
-                    val intent = Intent(this, HomePage::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, HomePage::class.java))
                     true
                 }
-
                 R.id.nav_forum -> {
-                    val intent = Intent(this, CommunityForumActivity::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, CommunityForumActivity::class.java))
                     true
                 }
-
                 R.id.nav_account -> {
-                    val intent = Intent(this, AccountPage::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, AccountPage::class.java))
                     true
                 }
-
-                R.id.workout_plan ->{
-
-                    true
-                }
-
+                R.id.workout_plan -> true // Already here
                 R.id.nav_past_data -> {
-                    val intent = Intent(this, ViewPastDataActivity::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, ViewPastDataActivity::class.java))
                     true
                 }
-
                 else -> false
             }
         }
     }
 
+
+    // HELPER FUNCTIONS
+    private fun getSavedToken(): String? {
+        val sharedPrefs = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        return sharedPrefs.getString("auth_token", null)
+    }
+
+    private fun redirectToLogin() {
+        Toast.makeText(this, "Please log in again", Toast.LENGTH_LONG).show()
+        val intent = Intent(this, LoginPage::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
 }
