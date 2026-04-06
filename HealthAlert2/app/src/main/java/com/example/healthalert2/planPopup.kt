@@ -44,7 +44,6 @@ class GeneratePlanBottomSheet(
             val access = view.findViewById<AutoCompleteTextView>(R.id.dropdownAccess).text.toString()
 
             val request = GeneratePlanRequest(
-                profile_id = 3, // You can replace this with a real user ID later
                 height = height,
                 weight = weight,
                 age = age,
