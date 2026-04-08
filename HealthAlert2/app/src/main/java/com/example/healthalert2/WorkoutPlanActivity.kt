@@ -63,7 +63,7 @@ class WorkoutPlanActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<FloatingActionButton>(R.id.fabGenerate).setOnClickListener {
+        findViewById<android.widget.Button>(R.id.fabGenerate).setOnClickListener {
             val bottomSheet = GeneratePlanBottomSheet { request ->
 
                 val token = getSavedToken()
