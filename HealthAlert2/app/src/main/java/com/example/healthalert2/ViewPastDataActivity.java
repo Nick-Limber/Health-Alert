@@ -137,6 +137,11 @@ public class ViewPastDataActivity extends AppCompatActivity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 return true;
+            } else if (id == R.id.workout_plan) {
+                Intent intent = new Intent(this, WorkoutPlanActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+                return true;
             } else if (id == R.id.nav_past_data) {
                 return false;
             }
