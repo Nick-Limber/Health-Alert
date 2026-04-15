@@ -66,7 +66,7 @@ class AccountPage : AppCompatActivity() {
                 .show()
         }
 
-        bottomNav.selectedItemId = R.id.nav_forum
+        bottomNav.selectedItemId = R.id.nav_account
 
         bottomNav.setOnItemSelectedListener {
             when (it.itemId) {
