@@ -103,6 +103,17 @@ class AccountPage : AppCompatActivity() {
                     true //this page
                 }
 
+                R.id.workout_plan -> {
+                    startActivity(Intent(this, WorkoutPlanActivity::class.java))
+                    true
+                }
+
+                R.id.nav_past_data -> {
+                    val intent = Intent(this, ViewPastDataActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
                 else -> false
             }
         }

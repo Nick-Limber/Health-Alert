@@ -28,17 +28,23 @@ app.get("/test", (req, res) => {
 // BASIC MIDDLEWARE
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cors({
+    origin: '*', // Allows your emulator to connect
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
 
 // AUTHENTICATION ROUTE
 app.use("/authentication", authenticationRoutes);
 
-// VERIFICATION MIDDLEWARE
-app.use(verificationMiddleware)
-
 // API ROUTES
 app.use("/health", healthRoutes);
 app.use("/posts", postsRoutes);
+
+// VERIFICATION MIDDLEWARE
+app.use(verificationMiddleware)
+
+// API ROUTES THAT NEED MIDDLEWARE
 app.use("/recommendation", recommendationRoutes);
 
 

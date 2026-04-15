@@ -29,18 +29,11 @@ const register = async (req, res) => {
 
         const [result] = await db_pool.execute("INSERT INTO profile (username, email, d_o_b, password) VALUES (?, ?, ?,?)", [username, email, d_o_b, hashedpassword]);
 
-        const token = generateToken(result.insertID);
+        const token = generateToken(result.insertId);
 
         res.status(201).json({
             status: "success",
-            data: {
-                user: {
-                    id: result.insertID,
-                    name: username,
-                    email: email
-                },
-                token,
-            },
+            token,
         });
 
     } catch (error) {

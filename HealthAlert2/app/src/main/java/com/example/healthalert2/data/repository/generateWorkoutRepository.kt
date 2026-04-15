@@ -7,11 +7,11 @@ import retrofit2.Response
 
 class GenerateWorkoutRepository(private val apiService: GeneratePlanApiService) {
 
-    suspend fun getWorkoutPlan(request: GeneratePlanRequest): Response<WorkoutResponse> {
-        return apiService.generateWorkoutPlan(request)
+    suspend fun getPlans(token: String): Response<WorkoutResponse> {
+        return apiService.fetchWorkoutPlan(token)
     }
 
-    suspend fun getPlans(profileId: Int): Response<WorkoutResponse> {
-        return apiService.fetchWorkoutPlan(profileId)
+    suspend fun getWorkoutPlan(token: String, request: GeneratePlanRequest): Response<WorkoutResponse> {
+        return apiService.generateWorkoutPlan(token, request)
     }
 }
