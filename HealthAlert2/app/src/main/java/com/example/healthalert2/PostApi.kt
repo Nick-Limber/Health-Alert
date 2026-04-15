@@ -38,4 +38,10 @@ interface PostApi {
     // To fetch all replies for a specific post
     @GET("posts/{postId}/replies")
     fun getReplies(@Path("postId") postId: Int): Call<List<Reply>>
+
+    @DELETE("posts/{postId}/replies/{id}")
+    fun deleteReply(
+        @Path("postId") postId: Int,
+        @Path("id") id: Int
+    ): Call<Void>
 }
