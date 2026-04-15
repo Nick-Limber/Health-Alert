@@ -9,30 +9,37 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "http://10.0.2.2:5005/"
+    private const val BASE_URL = "https://gleaming-sparkle-production-acb6.up.railway.app/"
 
     private val moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
         .build()
 
-    private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+    private val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        })
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .build()
+
+    // Using lazy here is perfectly fine now!
+    private val retrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
     }
 
-    private val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(loggingInterceptor)
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
-        .build()
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .client(okHttpClient)
-        .addConverterFactory(MoshiConverterFactory.create(moshi)) // Uses the variable above
-        .build()
+    val loginApiService: LoginApiService by lazy {
+        retrofit.create(LoginApiService::class.java)
+    }
 
     val generatePlanApiService: GeneratePlanApiService by lazy {
         retrofit.create(GeneratePlanApiService::class.java)
+    }
+
+    val registerApiService:RegisterApiService by lazy {
+        retrofit.create(RegisterApiService::class.java)
     }
 }

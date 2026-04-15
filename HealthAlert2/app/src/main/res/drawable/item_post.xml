@@ -44,4 +44,31 @@
         android:layout_margin="8dp"
         android:contentDescription="Delete Post"/>
 
+    <!-- Show/Hide Replies Button -->
+    <Button
+        android:id="@+id/btnShowReplies"
+        android:layout_below="@id/tvTimestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Replies"
+        android:layout_marginTop="4dp"/>
+
+    <!-- Replies Layout -->
+    <LinearLayout
+        android:id="@+id/repliesLayout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnShowReplies"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Reply Button -->
+    <Button
+        android:id="@+id/btnReply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reply"
+        android:layout_below="@id/repliesLayout"
+        android:layout_marginTop="4dp"/>
+
 </RelativeLayout>

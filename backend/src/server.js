@@ -1,7 +1,11 @@
 import "./loadEnv.js";
-
+import { config } from "dotenv";
+import cors from 'cors';
 import express from "express"
 import { close_pool, db_pool } from "./config/db.js";
+
+// IMPORT MIDDLEWARE
+import { verificationMiddleware } from "./middleware/verificationMiddleware.js";
 
 // IMPORT ROUTES
 import healthRoutes from "./routes/healthRoutes.js";
@@ -11,23 +15,38 @@ import recommendationRoutes from "./routes/recommendationRoutes.js";
 
 // ADD ENV VARIABLES AND CONNECT TO DB
 
+config();
+
 const app = express();
-const PORT = 5005;
+const PORT = process.env.PORT || 5005;
 
 app.get("/test", (req, res) => {
     console.log("Testing server connectivity...");
     res.send("Server is alive!");
 });
 
-// MIDDLEWARE
+// BASIC MIDDLEWARE
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+    origin: '*', // Allows your emulator to connect
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
+
+// AUTHENTICATION ROUTE
+app.use("/authentication", authenticationRoutes);
 
 // API ROUTES
 app.use("/health", healthRoutes);
-app.use("/authentication", authenticationRoutes);
 app.use("/posts", postsRoutes);
+
+// VERIFICATION MIDDLEWARE
+app.use(verificationMiddleware)
+
+// API ROUTES THAT NEED MIDDLEWARE
 app.use("/recommendation", recommendationRoutes);
+
 
 const server = app.listen(PORT, "0.0.0.0", () => {
     console.log(`server running on PORT ${PORT}`);

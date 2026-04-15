@@ -29,19 +29,11 @@ const register = async (req, res) => {
 
         const [result] = await db_pool.execute("INSERT INTO profile (username, email, d_o_b, password) VALUES (?, ?, ?,?)", [username, email, d_o_b, hashedpassword]);
 
-        const token = generateToken(result.insertID);
-
+        const token = generateToken(result.insertId);
 
         res.status(201).json({
-            status: "succcess",
-            data: {
-                user: {
-                    id: result.insertID,
-                    name: username,
-                    email: email
-                },
-                token,
-            },
+            status: "success",
+            token,
         });
 
     } catch (error) {
@@ -49,9 +41,8 @@ const register = async (req, res) => {
     }
 }
 
-
-
 const login = async (req, res) => {
+
     const { email, password } = req.body;
 
     try {
@@ -69,24 +60,21 @@ const login = async (req, res) => {
             return res.status(401).json({ error: "invalid email or password" });
         }
 
-        const token = generateToken(rows[0].userID);
+        const token = generateToken(rows[0].profile_id);
 
         res.status(201).json({
             status: "succcess",
             data: {
                 user: {
-                    id: rows[0].userID,
+                    id: rows[0].profile_id,
                     email: email
                 },
                 token,
             },
         });
-
-
     }
     catch (error) {
         res.status(500).json({ error: `${error}` });
     }
 }
-
 export { register, login };

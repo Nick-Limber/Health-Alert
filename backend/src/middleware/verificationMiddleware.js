@@ -1,10 +1,11 @@
-import jwt from JsonWebToken;
+import jwt from "jsonwebtoken";
+import { db_pool } from "../config/db.js";
 
-export const verificationMiddleware = async (req, res, next) => {
+const verificationMiddleware = async (req, res, next) => {
     let token;
 
-    if (req.headers.authorization && headers.authorization.startsWith("Bearer")) {
-        token = req.headers.authroization.split(" ")[1];
+    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+        token = req.headers.authorization.split(" ")[1];
     }
 
     if (!token) {
@@ -15,16 +16,17 @@ export const verificationMiddleware = async (req, res, next) => {
         // Decode JWT (Token gets decoded into payload -> id: userID)
         const decode = jwt.verify(token, process.env.TOKEN_SECRET);
 
-        const [[user]] = db_pool.execute("SELECT userID FROM user WHERE userID == ?", [decode.id]);
+        const [[user]] = await db_pool.execute("SELECT profile_id FROM profile WHERE profile_id = ?", [decode.id]);
 
         if (!user) {
-            return res.ststus(401).json({ error: "No user" });
+            return res.status(401).json({ error: "No user" });
         }
 
-        req.user = user;
+        req.user = user.profile_id;
         next();
 
     } catch (error) {
         return res.status(401).json({ error: `${error}` });
     }
 }
+export { verificationMiddleware };
