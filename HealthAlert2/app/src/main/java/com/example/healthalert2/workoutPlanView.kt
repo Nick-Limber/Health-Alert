@@ -18,37 +18,40 @@ class WorkoutViewModel(private val repository: GenerateWorkoutRepository) : View
     val activePlansResult = MutableLiveData<WorkoutResponse?>()
     val isLoading = MutableLiveData<Boolean>(false)
     val errorMessage = MutableLiveData<String?>()
-    fun generateNewPlan(request: GeneratePlanRequest) {
+
+    fun generateNewPlan(token: String, request: GeneratePlanRequest) {
         viewModelScope.launch {
             isLoading.value = true
             errorMessage.value = null
 
             try {
-                // Hardcoding profile_id to 5 as requested for your dev environment
-                val hardcodedRequest = request.copy(profile_id = 7)
-                val response = repository.getWorkoutPlan(hardcodedRequest)
+                val authHeader = "Bearer $token"
+                val response = repository.getWorkoutPlan(authHeader, request)
 
                 if (response.isSuccessful) {
-                    fetchPlans(7)
-
+                    Log.d("FLOW_DEBUG", "1. Plan created successfully on backend")
+                    fetchPlans(token)
                 } else {
                     errorMessage.value = "Server Error: ${response.code()}"
-                    Log.e("API_ERROR", "Code: ${response.code()} Body: ${response.errorBody()?.string()}")
+                    Log.e("API_ERROR", "Code: ${response.code()}")
                 }
             } catch (e: Exception) {
                 errorMessage.value = "Network Error: ${e.localizedMessage}"
-                Log.e("API_EXCEPTION", e.stackTraceToString())
             } finally {
                 isLoading.value = false
             }
         }
     }
 
-    fun fetchPlans(profileId: Int) {
+    fun fetchPlans(token: String) {
         viewModelScope.launch {
             isLoading.value = true
             try {
-                val response = repository.getPlans(profileId)
+                val authHeader = "Bearer $token"
+
+                // Pass the authHeader instead of profileId
+                val response = repository.getPlans(authHeader)
+
                 Log.d("API_DEBUG", "Fetch Plans Response Code: ${response.code()}")
                 if (response.isSuccessful) {
                     activePlansResult.postValue(response.body())

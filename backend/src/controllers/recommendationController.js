@@ -2,7 +2,8 @@ import { db_pool } from "../config/db.js";
 import { randomExercise } from "../utils/reccomendHelper.js"
 
 const generate = async (req, res) => {
-    const { profile_id, height, weight, age, goal, muscle, level, access, workout_name } = req.body;
+    const { height, weight, age, goal, muscle, level, access, workout_name } = req.body;
+    const profile_id = req.user;
 
     // CHECK HOW MANY ACTIVE RECCOMENDATIONS USER HAS
     const active_sql = "SELECT * FROM workout_plans WHERE profile_id = ? AND active = ?";
@@ -68,19 +69,13 @@ const generate = async (req, res) => {
                         candidates = pool.filter(row => row.muscle_target === slot && !usedIds.has(row.exercise_id));
                     }
 
-                    // --- NEW DEBUG LOGS ---
-                    console.log(`--- Slot ${index + 1} (${slot}) ---`);
-                    console.log(`Found ${candidates.length} candidates in pool.`);
-
                     const selection = randomExercise(candidates.length ? candidates : pool);
 
                     if (selection) {
-                        console.log(`Selected: ${selection.exercise_name} (ID: ${selection.exercise_id})`);
                         usedIds.add(selection.exercise_id);
                         return selection;
                     }
 
-                    console.error(`!!! FAILED TO SELECT for slot: ${slot}. Using fallback.`);
                     return { exercise_name: "Generic Exercise", exercise_id: 0 };
                 });
             };
@@ -217,4 +212,30 @@ const getPlans = async (req, res) => {
     }
 };
 
-export { generate, getPlans };
+const deletePlan = async (req, res) => {
+
+    const { plan_id } = req.body;
+
+    try {
+        const sql = "DELETE FROM workout_plans WHERE plan_id = ?";
+
+        const [result] = await db_pool.execute(sql, [plan_id]);
+
+        if (!plan_id) {
+            return res.status(400).json({ success: false, message: "planId is required" });
+        }
+
+        if (result.affectedRows > 0) {
+            return res.status(201).json({ success: true })
+        }
+        else {
+            return res.status(400).json({ success: false, message: "no plan found" })
+        }
+
+
+    } catch (error) {
+        res.status(500).json({ success: false, error: `${error}` });
+    }
+}
+
+export { generate, getPlans, deletePlan };

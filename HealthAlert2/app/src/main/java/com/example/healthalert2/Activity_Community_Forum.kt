@@ -66,6 +66,10 @@ class CommunityForumActivity : AppCompatActivity() {
                     startActivity(Intent(this, AccountPage::class.java))
                     true
                 }
+                R.id.workout_plan -> {
+                    startActivity(Intent(this, WorkoutPlanActivity::class.java))
+                    true
+                }
 
                 R.id.nav_past_data -> {
                     val intent = Intent(this, ViewPastDataActivity::class.java)
