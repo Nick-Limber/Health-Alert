@@ -16,10 +16,10 @@ const db_pool = mysql.createPool({
     connectionLimit: 10,
     enableKeepAlive: true,        // Prevents the "Reset" error you saw
     keepAliveInitialDelay: 10000, // Sends a "ping" every 10 seconds
-    ssl: {
-        ca: fs.readFileSync(Path),
+    /*ssl: {
+        ca: fs.readFileSync(caPath),
         rejectUnauthorized: true  // Ensures the cert is strictly validated
-    }
+    }*/
 });
 
 const close_pool = async () => {

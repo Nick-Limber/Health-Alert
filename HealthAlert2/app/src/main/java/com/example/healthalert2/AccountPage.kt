@@ -15,9 +15,18 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.card.MaterialCardView
 import android.app.AlertDialog
 
+//added by Nicholas
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.IOException
+
 class AccountPage : AppCompatActivity() {
     private lateinit var profileImage: ImageView
     private val PICK_IMAGE = 1
+
+    //added by Nicholas
+    private val client = OkHttpClient()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +75,13 @@ class AccountPage : AppCompatActivity() {
                 .show()
         }
 
+        //added by Nicholas
+        val deleteAccount = findViewById<MaterialCardView>(R.id.deleteAccountContainer)
+
+        deleteAccount.setOnClickListener {
+            showDeleteConfirmationDialog()
+        }
+
         bottomNav.selectedItemId = R.id.nav_forum
 
         bottomNav.setOnItemSelectedListener {
@@ -90,6 +106,77 @@ class AccountPage : AppCompatActivity() {
                 else -> false
             }
         }
+    }
+
+    //added by Nicholas
+    private fun showDeleteConfirmationDialog() {
+
+        val dialogView = layoutInflater.inflate(R.layout.dialouge_reauthenticator, null)
+        val emailInput = dialogView.findViewById<android.widget.EditText>(R.id.reAuthEmail)
+        val passInput = dialogView.findViewById<android.widget.EditText>(R.id.reAuthPassword)
+
+        AlertDialog.Builder(this)
+            .setTitle("Confrim Hard Deletion")
+            .setMessage("This will permanently delete your data.")
+            .setView(dialogView)
+            .setPositiveButton("Delete Forever") { _, _ ->
+                val email = emailInput.text.toString()
+                val password = passInput.text.toString()
+
+                if (email.isNotEmpty() && password.isNotEmpty())
+                {
+                    performAccountDeletion(email, password)
+                }
+                else
+                {
+                    Toast.makeText(this, "Please enter your credentials", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    //added by Nicholas
+    private fun performAccountDeletion(email: String, pass: String)
+    {
+        val url = "http://10.0.2.2:5005/api/delete-account"
+
+        val jsonPayload = """
+            {
+                "email:": "$email",
+                "password": "$pass"
+            }
+            """.trimIndent()
+
+        val body = jsonPayload.toRequestBody("application/json; charset=utf-8".toMediaType())
+
+        val request = Request.Builder()
+            .url(url)
+            .delete(body)
+            .build()
+
+        client.newCall(request).enqueue(object : okhttp3.Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread { Toast.makeText(this@AccountPage, "Sever error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun  onResponse(call: Call, response: Response) {
+                runOnUiThread {
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@AccountPage, "Account has been deleted.", Toast.LENGTH_SHORT).show()
+
+                        val intent = Intent(this@AccountPage, LoginPage::class.java)
+
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        Toast.makeText(this@AccountPage, "Deletion failed: Invalid credentials", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
