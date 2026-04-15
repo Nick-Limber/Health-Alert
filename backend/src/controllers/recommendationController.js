@@ -72,12 +72,10 @@ const generate = async (req, res) => {
                     const selection = randomExercise(candidates.length ? candidates : pool);
 
                     if (selection) {
-                        console.log(`Selected: ${selection.exercise_name} (ID: ${selection.exercise_id})`);
                         usedIds.add(selection.exercise_id);
                         return selection;
                     }
 
-                    console.error(`!!! FAILED TO SELECT for slot: ${slot}. Using fallback.`);
                     return { exercise_name: "Generic Exercise", exercise_id: 0 };
                 });
             };
