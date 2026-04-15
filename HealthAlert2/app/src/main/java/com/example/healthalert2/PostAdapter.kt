@@ -44,12 +44,16 @@ class PostAdapter(
         val post = postList[position]
         val context = holder.itemView.context
 
-        // Display post content
         holder.tvTitle.text = post.title
         holder.tvContent.text = post.content
         holder.tvTimestamp.text = getTimeAgo(post.timestamp)
 
-        // Edit post on long click
+        // Reset visibility and content for recycled views
+        holder.repliesLayout.visibility = View.GONE
+        holder.btnShowReplies.text = "Show Replies"
+        holder.repliesLayout.removeAllViews()
+
+        // EDIT POST - LONG CLICK
         holder.itemView.setOnLongClickListener {
             val intent = Intent(context, CreatePostActivity::class.java).apply {
                 putExtra("postId", post.postId)
@@ -60,104 +64,206 @@ class PostAdapter(
             true
         }
 
-        // Delete post
+        // DELETE POST
         holder.btnDelete.setOnClickListener {
-            val currentPosition = holder.adapterPosition
-            if (currentPosition != RecyclerView.NO_POSITION) {
-                val postId = postList[currentPosition].postId
-                RetrofitInstance.api.deletePost(postId).enqueue(object : Callback<Void> {
-                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                        if (response.isSuccessful) {
-                            postList.removeAt(currentPosition)
-                            notifyItemRemoved(currentPosition)
-                        } else {
-                            Toast.makeText(context, "Failed to delete post", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+            val context = holder.itemView.context
 
-                    override fun onFailure(call: Call<Void>, t: Throwable) {
-                        Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                    }
-                })
-            }
-        }
+            AlertDialog.Builder(context)
+                .setTitle("Delete Post")
+                .setMessage("Are you sure you want to delete this post?")
+                .setPositiveButton("Yes") { _, _ ->
 
-        // Helper to populate replies in UI
-        fun updateRepliesUI(replies: List<Reply>) {
-            holder.repliesLayout.removeAllViews()
-            for (reply in replies) {
-                val replyView = TextView(context).apply {
-                    text = "↳ User ${reply.userId}: ${reply.content}"
-                    setPadding(16, 4, 0, 4)
-                    textSize = 14f
+                    val currentPosition = holder.adapterPosition
+                    if (currentPosition != RecyclerView.NO_POSITION) {
+
+                        val postId = postList[currentPosition].postId
+
+                        RetrofitInstance.api.deletePost(postId)
+                            .enqueue(object : Callback<Void> {
+                                override fun onResponse(
+                                    call: Call<Void>,
+                                    response: Response<Void>
+                                ) {
+                                    if (response.isSuccessful) {
+                                        postList.removeAt(currentPosition)
+                                        notifyItemRemoved(currentPosition)
+                                        Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        Toast.makeText(context, "Failed to delete post", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+
+                                override fun onFailure(call: Call<Void>, t: Throwable) {
+                                    Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                    }
                 }
-                holder.repliesLayout.addView(replyView)
-            }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
 
-        // Initial setup for replies (show what's already in memory)
-        updateRepliesUI(post.replies ?: emptyList())
-        holder.repliesLayout.visibility = View.GONE
-        holder.btnShowReplies.text = "Show Replies"
-
-        // Toggle replies AND fetch from MySQL
+        // SHOW/HIDE REPLIES
         holder.btnShowReplies.setOnClickListener {
             if (holder.repliesLayout.visibility == View.GONE) {
-                // Fetch fresh replies from backend
-                RetrofitInstance.api.getReplies(post.postId).enqueue(object : Callback<List<Reply>> {
-                    override fun onResponse(call: Call<List<Reply>>, response: Response<List<Reply>>) {
-                        if (response.isSuccessful) {
-                            val fetchedReplies = response.body() ?: emptyList()
+                RetrofitInstance.api.getReplies(post.postId)
+                    .enqueue(object : Callback<List<Reply>> {
+                        override fun onResponse(
+                            call: Call<List<Reply>>,
+                            response: Response<List<Reply>>
+                        ) {
+                            if (response.isSuccessful) {
+                                val replies = response.body() ?: emptyList()
 
-                            // 1. Update local post data so it persists
-                            val currentPos = holder.adapterPosition
-                            if (currentPos != RecyclerView.NO_POSITION) {
-                                postList[currentPos] = postList[currentPos].copy(replies = fetchedReplies)
+                                if (replies.isEmpty()) {
+                                    Toast.makeText(context, "No replies yet", Toast.LENGTH_SHORT).show()
+                                    holder.repliesLayout.visibility = View.VISIBLE
+                                    holder.btnShowReplies.text = "Hide Replies"
+                                    holder.repliesLayout.removeAllViews()
+                                    return
+                                }
+
+                                val currentPos = holder.adapterPosition
+                                if (currentPos != RecyclerView.NO_POSITION) {
+                                    postList[currentPos] = postList[currentPos].copy(replies = replies)
+                                }
+
+                                renderReplies(holder, replies, post.postId, context)
+
+                                holder.repliesLayout.visibility = View.VISIBLE
+                                holder.btnShowReplies.text = "Hide Replies"
                             }
-
-                            // 2. Update UI
-                            updateRepliesUI(fetchedReplies)
-                            holder.repliesLayout.visibility = View.VISIBLE
-                            holder.btnShowReplies.text = "Hide Replies"
-
-                            if (fetchedReplies.isEmpty()) {
-                                Toast.makeText(context, "No replies yet", Toast.LENGTH_SHORT).show()
-                            }
-                        } else {
-                            Toast.makeText(context, "Failed to load replies", Toast.LENGTH_SHORT).show()
                         }
-                    }
 
-                    override fun onFailure(call: Call<List<Reply>>, t: Throwable) {
-                        Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                    }
-                })
+                        override fun onFailure(call: Call<List<Reply>>, t: Throwable) {
+                            Toast.makeText(context, "Error loading replies", Toast.LENGTH_SHORT).show()
+                        }
+                    })
             } else {
                 holder.repliesLayout.visibility = View.GONE
                 holder.btnShowReplies.text = "Show Replies"
             }
         }
 
-        // Reply button (safe context for AlertDialog)
+        // REPLY BUTTON
         holder.btnReply.setOnClickListener {
-            val activity = context as? android.app.Activity
-            activity?.let { act ->
-                val input = EditText(context)
-                AlertDialog.Builder(act)
-                    .setTitle("Reply to Post")
-                    .setView(input)
-                    .setPositiveButton("Send") { _, _ ->
-                        val content = input.text.toString()
-                        if (content.isNotEmpty()) {
-                            sendReply(post.postId, currentUserId, content, context, holder)
+            val input = EditText(context)
+            AlertDialog.Builder(context)
+                .setTitle("Reply")
+                .setView(input)
+                .setPositiveButton("Send") { _, _ ->
+                    val text = input.text.toString()
+                    if (text.isNotEmpty()) {
+                        sendReply(post.postId, currentUserId, text, context, holder)
+                    }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+    }
+
+    private fun renderReplies(
+        holder: PostViewHolder,
+        replies: List<Reply>,
+        postId: Int,
+        context: Context
+    ) {
+        holder.repliesLayout.removeAllViews()
+        for (reply in replies) {
+            val row = LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(16, 6, 0, 6)
+            }
+
+            val text = TextView(context).apply {
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                this.text = "↳ User ${reply.userId}: ${reply.content}"
+                textSize = 14f
+            }
+            row.addView(text)
+
+            // Show delete button only if it's the current user's reply
+            if (reply.userId == currentUserId) {
+                val deleteBtn = ImageButton(context).apply {
+                    setImageResource(android.R.drawable.ic_menu_delete)
+                    setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                }
+
+                deleteBtn.setOnClickListener {
+                    AlertDialog.Builder(context)
+                        .setTitle("Delete Reply")
+                        .setMessage("Are you sure?")
+                        .setPositiveButton("Yes") { _, _ ->
+                            deleteReply(postId, reply.id, holder, context) 
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+                }
+                row.addView(deleteBtn)
+            }
+            holder.repliesLayout.addView(row)
+        }
+    }
+
+    private fun deleteReply(
+        postId: Int,
+        replyId: Int,
+        holder: PostViewHolder,
+        context: Context
+    ) {
+        RetrofitInstance.api.deleteReply(postId, replyId).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "Reply deleted", Toast.LENGTH_SHORT).show()
+                    // Refresh replies for this post
+                    RetrofitInstance.api.getReplies(postId).enqueue(object : Callback<List<Reply>> {
+                        override fun onResponse(call: Call<List<Reply>>, response: Response<List<Reply>>) {
+                            if (response.isSuccessful) {
+                                renderReplies(holder, response.body() ?: emptyList(), postId, context)
+                            }
+                        }
+                        override fun onFailure(call: Call<List<Reply>>, t: Throwable) {}
+                    })
+                }
+            }
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun sendReply(
+        postId: Int,
+        userId: Int,
+        content: String,
+        context: Context,
+        holder: PostViewHolder
+    ) {
+        RetrofitInstance.api.sendReply(postId, CreateReplyRequest(userId, content))
+            .enqueue(object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(context, "Reply sent", Toast.LENGTH_SHORT).show()
+                        // Automatically show/refresh replies
+                        if (holder.repliesLayout.visibility == View.GONE) {
+                            holder.btnShowReplies.performClick()
+                        } else {
+                            // If already open, just fetch again to show the new one
+                            RetrofitInstance.api.getReplies(postId).enqueue(object : Callback<List<Reply>> {
+                                override fun onResponse(call: Call<List<Reply>>, response: Response<List<Reply>>) {
+                                    if (response.isSuccessful) {
+                                        renderReplies(holder, response.body() ?: emptyList(), postId, context)
+                                    }
+                                }
+                                override fun onFailure(call: Call<List<Reply>>, t: Throwable) {}
+                            })
                         }
                     }
-                    .setNegativeButton("Cancel", null)
-                    .show()
-            } ?: run {
-                Toast.makeText(context, "Unable to show reply dialog", Toast.LENGTH_SHORT).show()
-            }
-        }
+                }
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
     }
 
     override fun getItemCount(): Int = postList.size
@@ -168,58 +274,23 @@ class PostAdapter(
         notifyDataSetChanged()
     }
 
-    private fun sendReply(postId: Int, userId: Int, content: String, context: Context, holder: PostViewHolder) {
-        val request = CreateReplyRequest(userId, content)
-        RetrofitInstance.api.sendReply(postId, request).enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(context, "Reply sent!", Toast.LENGTH_SHORT).show()
-                    // Re-trigger the fetch to show the new reply
-                    if (holder.repliesLayout.visibility == View.VISIBLE) {
-                        // Refresh if already open
-                        holder.repliesLayout.visibility = View.GONE
-                        holder.btnShowReplies.performClick()
-                    } else {
-                        // open it
-                        holder.btnShowReplies.performClick()
-                    }
-                } else {
-                    Toast.makeText(context, "Failed to send reply", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-    fun getTimeAgo(timestamp: String): String {
+    private fun getTimeAgo(timestamp: String): String {
         return try {
-            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
-
-            val past = inputFormat.parse(timestamp)?.time ?: return timestamp
-            val now = System.currentTimeMillis()
-
-            val diff = now - past
-
-            val seconds = diff / 1000
-            val minutes = seconds / 60
+            val f = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            f.timeZone = TimeZone.getTimeZone("UTC")
+            val time = f.parse(timestamp)?.time ?: return timestamp
+            val diff = System.currentTimeMillis() - time
+            val minutes = diff / 60000
             val hours = minutes / 60
             val days = hours / 24
-
             when {
-                seconds < 60 -> "Just now"
+                minutes < 1 -> "Just now"
                 minutes < 60 -> "$minutes min ago"
                 hours < 24 -> "$hours hr ago"
-                days < 7 -> "$days day${if (days > 1) "s" else ""} ago"
-                else -> {
-                    val outputFormat = SimpleDateFormat("MMM d", Locale.getDefault())
-                    outputFormat.format(Date(past))
-                }
+                else -> "$days days ago"
             }
         } catch (e: Exception) {
-            timestamp // fallback if parsing fails
+            timestamp
         }
     }
 }
