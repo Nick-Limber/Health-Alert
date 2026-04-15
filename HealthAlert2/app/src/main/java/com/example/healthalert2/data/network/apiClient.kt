@@ -38,4 +38,8 @@ object RetrofitClient {
     val generatePlanApiService: GeneratePlanApiService by lazy {
         retrofit.create(GeneratePlanApiService::class.java)
     }
+
+    val registerApiService:RegisterApiService by lazy {
+        retrofit.create(RegisterApiService::class.java)
+    }
 }
