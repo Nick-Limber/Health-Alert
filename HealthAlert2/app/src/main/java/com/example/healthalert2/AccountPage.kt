@@ -64,12 +64,7 @@ class AccountPage : AppCompatActivity() {
                 .setTitle("Sign Out")
                 .setMessage("Are you sure you want to sign out?")
                 .setPositiveButton("Sign Out") { _, _ ->
-
-                    val intent = Intent(this, LoginPage::class.java)
-                    startActivity(intent)
-
-
-                    finish()
+                    handleLogout()
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
@@ -82,7 +77,7 @@ class AccountPage : AppCompatActivity() {
             showDeleteConfirmationDialog()
         }
 
-        bottomNav.selectedItemId = R.id.nav_forum
+        bottomNav.selectedItemId = R.id.nav_account
 
         bottomNav.setOnItemSelectedListener {
             when (it.itemId) {
@@ -197,6 +192,21 @@ class AccountPage : AppCompatActivity() {
             val imageUri: Uri? = data?.data
             profileImage.setImageURI(imageUri)
         }
+    }
+    private fun handleLogout() {
+        val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            remove("auth_token")
+            apply()
+        }
+
+        val intent = Intent(this, MainActivity::class.java)
+
+        // These flags prevent the user from clicking 'Back' to return to the Account page
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+        startActivity(intent)
+        finish()
     }
 
 
