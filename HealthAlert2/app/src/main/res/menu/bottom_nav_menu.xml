@@ -3,24 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/nav_home"
-        android:icon="@android:drawable/ic_menu_view"
+        android:icon="@drawable/baseline_home_24"
         android:title="Home" />
 
     <item
         android:id="@+id/nav_forum"
-        android:icon="@android:drawable/ic_menu_edit"
+        android:icon="@drawable/baseline_forum_24"
         android:title="Forum" />
 
     <item
         android:id="@+id/nav_account"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/baseline_person_24"
         android:title="Account" />
     <item
         android:id="@id/workout_plan"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/baseline_fitness_center_24"
         android:title="Plan"/>
     <item
         android:id="@+id/nav_past_data"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/baseline_calendar_month_24"
         android:title="View Past Data"/>
 </menu>
