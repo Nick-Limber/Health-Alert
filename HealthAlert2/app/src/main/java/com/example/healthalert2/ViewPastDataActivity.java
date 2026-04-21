@@ -151,7 +151,7 @@ public class ViewPastDataActivity extends AppCompatActivity {
 
     private void fetchPastDataFromBackend() {
         int loggedInUserId = 1;
-        String url = "http://10.0.2.2:5005/health/pastdata?profile_id=" + loggedInUserId; //backend endpoint
+        String url = "https://gleaming-sparkle-production-acb6.up.railway.app/"; //backend endpoint
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
