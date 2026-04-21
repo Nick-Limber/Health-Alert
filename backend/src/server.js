@@ -12,6 +12,7 @@ import healthRoutes from "./routes/healthRoutes.js";
 import authenticationRoutes from "./routes/authenticationRoutes.js";
 import postsRoutes from "./routes/postsRoutes.js";
 import recommendationRoutes from "./routes/recommendationRoutes.js";
+import dietRoutes from "./routes/dietRoutes.js";
 
 // ADD ENV VARIABLES AND CONNECT TO DB
 
@@ -46,7 +47,7 @@ app.use(verificationMiddleware)
 
 // API ROUTES THAT NEED MIDDLEWARE
 app.use("/recommendation", recommendationRoutes);
-
+app.use("/diet", dietRoutes);
 
 const server = app.listen(PORT, "0.0.0.0", () => {
     console.log(`server running on PORT ${PORT}`);
