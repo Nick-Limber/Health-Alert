@@ -37,7 +37,6 @@ const getDiets = async (req, res) => {
         res.status(500).json({ message: "Unable to save diet to database.", error: `${error}` });
     }
 
-
 }
 
 export { addDiet, getDiets };
