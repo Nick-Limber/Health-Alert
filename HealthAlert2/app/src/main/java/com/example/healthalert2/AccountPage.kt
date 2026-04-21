@@ -181,7 +181,7 @@ class AccountPage : AppCompatActivity() {
                 Log.d("APP_TEST", "OkHTTP onResponse triggered! HTTP code: ${response.code}")
                 runOnUiThread {
                     if (response.isSuccessful) {
-                        Toast.makeText(this@AccountPage, "Account has been deleted.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@AccountPage, "Account has been deleted.", Toast.LENGTH_LONG).show()
 
                         val intent = Intent(this@AccountPage, LoginPage::class.java)
 
@@ -189,7 +189,7 @@ class AccountPage : AppCompatActivity() {
                         startActivity(intent)
                         finish()
                     } else {
-                        Toast.makeText(this@AccountPage, "Deletion failed: Invalid credentials", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@AccountPage, "Deletion failed", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
