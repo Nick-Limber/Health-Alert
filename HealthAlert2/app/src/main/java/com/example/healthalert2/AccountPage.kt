@@ -16,6 +16,7 @@ import com.google.android.material.card.MaterialCardView
 import android.app.AlertDialog
 
 //added by Nicholas
+import android.util.Log
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -74,6 +75,7 @@ class AccountPage : AppCompatActivity() {
         val deleteAccount = findViewById<MaterialCardView>(R.id.deleteAccountContainer)
 
         deleteAccount.setOnClickListener {
+            Log.d("APP_TEST:", "The container card was clicked! Opening Dialog...")
             showDeleteConfirmationDialog()
         }
 
@@ -126,6 +128,9 @@ class AccountPage : AppCompatActivity() {
             .setMessage("This will permanently delete your data.")
             .setView(dialogView)
             .setPositiveButton("Delete Forever") { _, _ ->
+
+                Log.d("APP_TEST:", "The delete forever built was successfully clicked")
+
                 val email = emailInput.text.toString()
                 val password = passInput.text.toString()
 
@@ -144,11 +149,14 @@ class AccountPage : AppCompatActivity() {
     //added by Nicholas
     private fun performAccountDeletion(email: String, pass: String)
     {
-        val url = "http://10.0.2.2:5005/api/delete-account"
+        val url = "https://gleaming-sparkle-production-acb6.up.railway.app/"
+
+
+        Log.d("APP_TEST", "Preparing to send request to $url for email: $email")
 
         val jsonPayload = """
             {
-                "email:": "$email",
+                "email": "$email",
                 "password": "$pass"
             }
             """.trimIndent()
@@ -160,13 +168,17 @@ class AccountPage : AppCompatActivity() {
             .delete(body)
             .build()
 
+        Log.d("APP_TEST", "Request built successfully, enqeuing now...")
+
         client.newCall(request).enqueue(object : okhttp3.Callback {
             override fun onFailure(call: Call, e: IOException) {
+                Log.e("APP_TEST", "OkHTTP onFailure triggered! Error: ${e.message}")
                 runOnUiThread { Toast.makeText(this@AccountPage, "Sever error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun  onResponse(call: Call, response: Response) {
+                Log.d("APP_TEST", "OkHTTP onResponse triggered! HTTP code: ${response.code}")
                 runOnUiThread {
                     if (response.isSuccessful) {
                         Toast.makeText(this@AccountPage, "Account has been deleted.", Toast.LENGTH_SHORT).show()
