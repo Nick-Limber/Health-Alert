@@ -1,10 +1,10 @@
 import express from "express";
-import { db_pool } from "../config/db.js";
 import argon2 from "argon2";
+import { db_pool } from "../config/db.js";
 
 const router = express.Router();
 
-router.delete('/delete-account', async (req, res) => {
+router.delete("/delete-account", async (req, res) => {
     const { email, password } = req.body;
 
     console.log("DELETE ACCOUNT REQUEST RECEIVED");
@@ -13,16 +13,11 @@ router.delete('/delete-account', async (req, res) => {
     try {
         // serches by email first
         const [rows] = await db_pool.query(
-            "SELECT profile_id FROM `profile` WHERE email = ?", 
+            "SELECT profile_id, password FROM `profile` WHERE email = ?", 
             [email]
         );
 
         console.log("Rows found:", rows.length);
-
-        if (rows.length > 0) {
-            const validPassword = await argon2.verify(rows[0].password, password);
-            console.log("Is the password valid?", validPassword);
-        }
 
         //exits if no email is found
         if (rows.length === 0) { 
@@ -32,8 +27,19 @@ router.delete('/delete-account', async (req, res) => {
 
         const user = rows[0];
 
+        if (!user.password) {
+            console.log("Delete failed: No password hash found in the database for this user");
+            return res.status(500).json({ error: "Account data corrupted: No password set" });
+        }
+
         //compares password to hasehed password in database
-        const validPassword = await argon2.verify(user.password, password);
+        let validPassword = false;
+        try {
+            validPassword = await argon2.verify(user.password, password);
+        } catch (hashError) {
+            console.log(" ARGON2 ERROR: The hash in the DB is invalid/malformed");
+            return res.status(500).json({ error: "Security check failed: Invalid hash format"});
+        }
 
         if (!validPassword) {
             console.log("Delete failed: Incorrect password");
