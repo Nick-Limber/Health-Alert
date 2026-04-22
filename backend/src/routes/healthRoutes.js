@@ -81,8 +81,8 @@ router.post("/log-weight", async (req, res) => {
         }
 
         const query = `
-            INSERT INTO personal_information (profile_id, weight, recorded_at)
-            VALUES (?, ?, NOW())
+            INSERT INTO personal_information (profile_id, weight, height, recorded_at)
+            VALUES (?, ?, 0, NOW())
         `;
 
         const [result] = await db_pool.query(query, [profile_id, weight]);
