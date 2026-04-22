@@ -7,7 +7,9 @@ data class Post(
     val postId: Int,
     val title: String,
     val content: String,
-    val timestamp: String,
+    val profileID: Int = 0,      // Match the 'p.profileID' from SQL
+    val username: String?,    // Match the 'pr.username' from SQL
+    val timestamp: String?,
     val replies: List<Reply>? = emptyList()
 )
 
@@ -23,8 +25,9 @@ data class Reply(
     val id: Int,
     val postId: Int,
     val userId: Int,
+    val username: String?, // Added to match your backend JOIN
     val content: String,
-    val timestamp: String
+    val timestamp: String?
 )
 
 data class CreateReplyRequest(
