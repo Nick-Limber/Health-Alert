@@ -2,34 +2,26 @@ package com.example.healthalert2
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import android.util.Log
-import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.healthalert2.data.network.AddDietRequest
 import com.example.healthalert2.data.network.RetrofitClient
-import com.example.healthalert2.data.network.AddDietRequest // Ensure this matches your actual data class name
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
-import android.widget.Toast
-import okhttp3.Call
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
-import okio.IOException
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-
-//added by Nicholas
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
-import android.widget.Button
-import okhttp3.Request
-  
+import java.io.IOException
+
 class HomePage : AppCompatActivity() {
-  
+
+    // Class-level properties (accessible to all functions)
     private lateinit var inputName: EditText
     private lateinit var inputCalories: EditText
     private lateinit var inputProtein: EditText
@@ -41,13 +33,17 @@ class HomePage : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
 
-        // 2. Initialize the views
+        // 1. Initialize Views
         inputName = findViewById(R.id.inputName)
         inputCalories = findViewById(R.id.inputCalories)
         inputProtein = findViewById(R.id.inputProtein)
         inputCarbs = findViewById(R.id.inputCarbs)
-        val logMealBtn = findViewById<Button>(R.id.logMealBtn)
 
+        val logMealBtn = findViewById<Button>(R.id.logMealBtn)
+        val saveWeightBtn = findViewById<Button>(R.id.btnSaveWeight)
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+
+        // 2. Button Listeners
         logMealBtn.setOnClickListener {
             val name = inputName.text.toString().trim()
             val calories = inputCalories.text.toString().trim().toIntOrNull()
@@ -65,16 +61,11 @@ class HomePage : AppCompatActivity() {
             }
         }
 
-        // Bottom Navigation Logic
-        //added by Nicholas
-        val saveWeightBtn = findViewById<Button>(R.id.btnSaveWeight)
-
         saveWeightBtn.setOnClickListener {
             showWeightEntryDialoug()
         }
 
-
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        // 3. Navigation
         bottomNav.setOnItemSelectedListener {
             when(it.itemId) {
                 R.id.nav_home -> true
@@ -97,9 +88,9 @@ class HomePage : AppCompatActivity() {
                 else -> false
             }
         }
-    }
+    } // End of onCreate
 
-    // 3. This function is now part of the class and can see the lateinit variables
+    // --- MEAL LOGGING (Retrofit) ---
     private fun saveMealToDatabase(name: String, calories: Int, protein: Int, carbs: Int) {
         val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = sharedPref.getString("auth_token", "") ?: ""
@@ -114,7 +105,6 @@ class HomePage : AppCompatActivity() {
 
                 if (response.isSuccessful) {
                     Toast.makeText(this@HomePage, "Meal Added Successfully!", Toast.LENGTH_SHORT).show()
-
                     inputName.text.clear()
                     inputCalories.text.clear()
                     inputProtein.text.clear()
@@ -127,26 +117,23 @@ class HomePage : AppCompatActivity() {
                 Toast.makeText(this@HomePage, "Failure: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             }
         }
-    //added by Nicholas
-    private fun showWeightEntryDialoug() {
-        val weightInput = android.widget.EditText(this)
-        weightInput.hint = "e.g. 180.5"
-        weightInput.inputType = android.view.inputmethod.EditorInfo.TYPE_CLASS_NUMBER or
-                android.view.inputmethod.EditorInfo.TYPE_NUMBER_FLAG_DECIMAL
+    } // This brace was missing in your code!
 
-        androidx.appcompat.app.AlertDialog.Builder(this)
+    // --- WEIGHT LOGGING (OkHttp) ---
+    private fun showWeightEntryDialoug() {
+        val weightInput = EditText(this)
+        weightInput.hint = "e.g. 180.5"
+        weightInput.inputType = EditorInfo.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_FLAG_DECIMAL
+
+        AlertDialog.Builder(this)
             .setTitle("Update Your Weight")
-            .setMessage("Ready to update your progress? Enter your current weight below:")
+            .setMessage("Enter your current weight below:")
             .setView(weightInput)
             .setPositiveButton("Update Now") { _, _ ->
                 val weightValue = weightInput.text.toString()
-
-                if (weightValue.isNotEmpty())
-                {
+                if (weightValue.isNotEmpty()) {
                     performWeightUpdate(weightValue)
-                }
-                else
-                {
+                } else {
                     Toast.makeText(this, "Please enter a value", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -157,46 +144,31 @@ class HomePage : AppCompatActivity() {
     private fun performWeightUpdate(weight: String) {
         val url = "https://gleaming-sparkle-production-acb6.up.railway.app/health/log-weight"
 
-        Log.d("APP_TEST", "Sending weight $weight to $url")
-
         val jsonPayload = """
             {
                 "profile_id": 1,
                 "weight": $weight
             }
-            """.trimIndent()
+        """.trimIndent()
 
         val body = jsonPayload.toRequestBody("application/json; charset=utf-8".toMediaType())
+        val request = Request.Builder().url(url).post(body).build()
 
-        val request = Request.Builder()
-            .url(url)
-            .post(body)
-            .build()
-
-        client.newCall(request).enqueue(object : okhttp3.Callback {
+        client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("APP_TEST", "Network Error: ${e.message}")
                 runOnUiThread {
-                    Toast.makeText(this@HomePage, "Server error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@HomePage, "Network Error", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val responseBody = response.body?.string()
-
-                Log.d("APP_TEST", "Response recieved: ${response.code} - $responseBody")
-
                 runOnUiThread {
-                    if (response.isSuccessful)
-                    {
+                    if (response.isSuccessful) {
                         Toast.makeText(this@HomePage, "Weight synced", Toast.LENGTH_LONG).show()
-                    }
-                    else
-                    {
-                        Toast.makeText(this@HomePage, "Update failed: ${response.code}", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@HomePage, "Failed: ${response.code}", Toast.LENGTH_SHORT).show()
                     }
                 }
-                response.close()
             }
         })
     }
