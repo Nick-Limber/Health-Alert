@@ -111,17 +111,31 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:text="Current Weight Status"
+                    android:id="@+id/weightPrompt"
+                    android:text="Ready to update your progress?"
                     android:textStyle="bold"
+                    android:textSize="18sp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"/>
 
-                <TextView
-                    android:id="@+id/lastWeightEntry"
-                    android:text="Last recorded: 180 lbs"
-                    android:layout_marginTop="8dp"
+                <EditText
+                    android:id="@+id/inputWeightNew"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:hint="0.0 lbs"
+                    android:gravity="center"
+                    android:inputType="numberDecimal"
+                    android:textSize="16sp"
+                    android:padding="10dp" />
+
+                <Button
+                    android:id="@+id/btnSaveWeight"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:text="Save Weight"
+                    android:layout_marginTop="12dp"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
