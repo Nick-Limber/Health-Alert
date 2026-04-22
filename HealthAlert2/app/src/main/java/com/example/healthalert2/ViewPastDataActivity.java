@@ -150,8 +150,13 @@ public class ViewPastDataActivity extends AppCompatActivity {
     }
 
     private void fetchPastDataFromBackend() {
-        int loggedInUserId = 1;
-        String url = "https://gleaming-sparkle-production-acb6.up.railway.app/"; //backend endpoint
+        android.content.SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+
+        int userId = prefs.getInt("current_user_id", 1);
+
+        String url = "https://gleaming-sparkle-production-acb6.up.railway.app/all-history/" + userId; //backend endpoint
+
+        Log.d("APP_DEBUG", "Fetching data for user: " +userId + " from URL: " + url);
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -238,6 +243,11 @@ public class ViewPastDataActivity extends AppCompatActivity {
                 },
                 error -> {
                     error.printStackTrace();
+                    String message = "Network Error";
+                    if (error.networkResponse != null)
+                    {
+                        message += " (Status: " + error.networkResponse.statusCode + ")";
+                    }
                     android.widget.Toast.makeText(ViewPastDataActivity.this, "Network Error", Toast.LENGTH_LONG).show();
                 }
 
