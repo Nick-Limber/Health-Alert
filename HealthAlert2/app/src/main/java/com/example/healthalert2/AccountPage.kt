@@ -150,7 +150,9 @@ class AccountPage : AppCompatActivity() {
     //added by Nicholas
     private fun performAccountDeletion(email: String, password: String)
     {
-        //val url = "https://gleaming-sparkle-production-acb6.up.railway.app/profile/delete-account"
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val token = prefs.getString("auth_token", "") ?: ""
+
         val url = "https://gleaming-sparkle-production-acb6.up.railway.app/profile/delete-account"
 
         Log.d("APP_TEST", "Preparing to send request to $url for email: $email")
@@ -163,6 +165,7 @@ class AccountPage : AppCompatActivity() {
 
         val request = Request.Builder()
             .url(url)
+            .addHeader("Authorization", "Bearer $token")
             .delete(body)
             .build()
 
