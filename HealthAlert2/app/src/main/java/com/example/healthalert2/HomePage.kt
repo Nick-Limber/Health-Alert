@@ -76,8 +76,8 @@ class HomePage : AppCompatActivity() {
 
     // 3. This function is now part of the class and can see the lateinit variables
     private fun saveMealToDatabase(name: String, calories: Int, protein: Int, carbs: Int) {
-        val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-        val token = sharedPref.getString("jwt_token", "") ?: ""
+        val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val token = sharedPref.getString("auth_token", "") ?: ""
         val authHeader = "Bearer $token"
 
         lifecycleScope.launch {
