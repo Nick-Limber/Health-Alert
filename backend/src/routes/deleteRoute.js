@@ -1,30 +1,57 @@
 import express from "express";
+import argon2 from "argon2";
 import { db_pool } from "../config/db.js";
 
 const router = express.Router();
 
-router.delete('/delete-account', async (req, res) => {
+router.delete("/delete-account", async (req, res) => {
     const { email, password } = req.body;
 
     console.log("DELETE ACCOUNT REQUEST RECEIVED");
     console.log(`Target email: ${email}`);
 
     try {
-        const [profileRows] = await db_pool.query(
-            "SELECT profile_id FROM `profile` WHERE email = ? AND password = ?", 
-            [email, password]
+        // serches by email first
+        const [rows] = await db_pool.query(
+            "SELECT profile_id, password FROM `profile` WHERE email = ?", 
+            [email]
         );
 
-        if (profileRows.length === 0) { 
-            console.log("Delete failed: Invalid credentials for email/password:",);
+        console.log("Rows found:", rows.length);
+
+        //exits if no email is found
+        if (rows.length === 0) { 
+            console.log("Delete failed: Email not found:");
             return res.status(401).json({ error: "Invalid credentials" });
         }
 
-        const masterId = profileRows[0].profile_id;
-        console.log(`Credentials verified. Proceeding to delete data for profile_id: ${masterId}`);
+        const user = rows[0];
+
+        if (!user.password) {
+            console.log("Delete failed: No password hash found in the database for this user");
+            return res.status(500).json({ error: "Account data corrupted: No password set" });
+        }
+
+        //compares password to hasehed password in database
+        let validPassword = false;
+        try {
+            validPassword = await argon2.verify(user.password, password);
+        } catch (hashError) {
+            console.log(" ARGON2 ERROR: The hash in the DB is invalid/malformed");
+            return res.status(500).json({ error: "Security check failed: Invalid hash format"});
+        }
+
+        if (!validPassword) {
+            console.log("Delete failed: Incorrect password");
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        const masterId = user.profile_id;
+        console.log(`Credentials verified for ID: ${masterId}. Deleting...`);
 
         const connection = await db_pool.getConnection();
 
+        //proceeds with deletion
         try {
             await connection.beginTransaction();
 
@@ -52,9 +79,8 @@ router.delete('/delete-account', async (req, res) => {
         connection.release();
     }
     } catch (err) {
-        console.log("ERROR IN DELETION ROUTE:");
-        console.error(err);
-        res.status(500).send("Database Error: " + err.message);
+        console.log("DATABASE ERROR:", err);
+        res.status(500).json({ error: "Server error during deletion" })
     }
 });
 

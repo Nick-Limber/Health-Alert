@@ -20,6 +20,7 @@ import android.util.Log
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import java.io.IOException
 
 class AccountPage : AppCompatActivity() {
@@ -131,8 +132,8 @@ class AccountPage : AppCompatActivity() {
 
                 Log.d("APP_TEST:", "The delete forever built was successfully clicked")
 
-                val email = emailInput.text.toString()
-                val password = passInput.text.toString()
+                val email = emailInput.text.toString().trim()
+                val password = passInput.text.toString().trim()
 
                 if (email.isNotEmpty() && password.isNotEmpty())
                 {
@@ -147,49 +148,59 @@ class AccountPage : AppCompatActivity() {
             .show()
     }
     //added by Nicholas
-    private fun performAccountDeletion(email: String, pass: String)
+    private fun performAccountDeletion(email: String, password: String)
     {
-        val url = "https://gleaming-sparkle-production-acb6.up.railway.app/"
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val token = prefs.getString("auth_token", "") ?: ""
 
+        val url = "https://gleaming-sparkle-production-acb6.up.railway.app/profile/delete-account"
 
         Log.d("APP_TEST", "Preparing to send request to $url for email: $email")
 
-        val jsonPayload = """
-            {
-                "email": "$email",
-                "password": "$pass"
-            }
-            """.trimIndent()
+        val json = JSONObject()
+        json.put("email", email)
+        json.put("password", password)
 
-        val body = jsonPayload.toRequestBody("application/json; charset=utf-8".toMediaType())
+        val body = json.toString().toRequestBody("application/json; charset=utf-8".toMediaType())
 
         val request = Request.Builder()
             .url(url)
+            .addHeader("Authorization", "Bearer $token")
             .delete(body)
             .build()
 
         Log.d("APP_TEST", "Request built successfully, enqeuing now...")
 
-        client.newCall(request).enqueue(object : okhttp3.Callback {
+        client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("APP_TEST", "OkHTTP onFailure triggered! Error: ${e.message}")
-                runOnUiThread { Toast.makeText(this@AccountPage, "Sever error: ${e.message}", Toast.LENGTH_SHORT).show()
+                runOnUiThread {
+                    Toast.makeText(this@AccountPage, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
 
-            override fun  onResponse(call: Call, response: Response) {
-                Log.d("APP_TEST", "OkHTTP onResponse triggered! HTTP code: ${response.code}")
+            override fun onResponse(call: Call, response: Response) {
+                val responseCode = response.code
+                val responseBody = response.body?.string() ?: ""
+                Log.d("APP_TEST", "Server Response ($responseCode): $responseBody")
+
                 runOnUiThread {
                     if (response.isSuccessful) {
-                        Toast.makeText(this@AccountPage, "Account has been deleted.", Toast.LENGTH_SHORT).show()
+                        //clears local session data
+                        val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+                        sharedPref.edit().clear().apply()
 
-                        val intent = Intent(this@AccountPage, LoginPage::class.java)
+                        Toast.makeText(this@AccountPage, "Account has been deleted.", Toast.LENGTH_LONG).show()
 
+                        //heads to start activity
+                        val intent = Intent(this@AccountPage, MainActivity::class.java)
+
+                        //clear the history so back doesnt work
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                         finish()
                     } else {
-                        Toast.makeText(this@AccountPage, "Deletion failed: Invalid credentials", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@AccountPage, "Deletion failed", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

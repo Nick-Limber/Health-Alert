@@ -14,7 +14,7 @@
         android:textSize="24sp"
         android:textStyle="bold"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="65dp"
         android:textColor="#333333"/>
 
     <LinearLayout
@@ -31,30 +31,127 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_marginBottom="12dp"
-            app:cardCornerRadius="15dp"
-            app:cardElevation="6dp">
+            app:cardCornerRadius="18dp"
+            app:cardElevation="8dp"
+            app:cardUseCompatPadding="true"
+            app:cardBackgroundColor="#FFFFFF">
 
             <LinearLayout
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="16dp"
+                android:padding="20dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:background="#FFFFFF"
+                android:baselineAligned="false">
 
+                <!-- HEADER -->
                 <TextView
                     android:text="Recent Nutrition Totals"
                     android:textStyle="bold"
                     android:textSize="18sp"
+                    android:textColor="#333333"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
                 <TextView
-                    android:id="@+id/totalNutritionStats"
-                    android:text="Cals: 0 | Protein: 0g | Carbs: 0g"
-                    android:layout_marginTop="8dp"
+                    android:text="Today’s summary"
+                    android:textSize="12sp"
+                    android:textColor="#444444"
+                    android:layout_marginTop="4dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:weightSum="3">
+
+                    <!-- CALORIES -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/caloriesValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="#6A1B9A"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Calories"
+                            android:textSize="12sp"
+                            android:textColor="#666666"/>
+                    </LinearLayout>
+
+                    <!-- PROTEIN -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/proteinValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0g"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="#00ACC1"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Protein"
+                            android:textSize="12sp"
+                            android:textColor="#666666"/>
+                    </LinearLayout>
+
+                    <!-- CARBS -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/carbsValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0g"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="#1E88E5"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Carbs"
+                            android:textSize="12sp"
+                            android:textColor="#666666"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
             </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
@@ -136,6 +233,10 @@
                         android:textSize="14sp"/>
 
                 </LinearLayout>
+                    android:hint="Calories"
+                    android:inputType="number"
+                    android:textSize="14sp"
+                    android:autofillHints="none" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -155,17 +256,32 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:text="Current Weight Status"
+                    android:id="@+id/weightPrompt"
+                    android:text="Ready to update your progress?"
                     android:textStyle="bold"
+                    android:textSize="18sp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"/>
 
-                <TextView
-                    android:id="@+id/lastWeightEntry"
-                    android:text="Last recorded: 180 lbs"
-                    android:layout_marginTop="8dp"
+                <EditText
+                    android:id="@+id/inputWeightNew"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:hint="0.0 lbs"
+                    android:gravity="center"
+                    android:inputType="numberDecimal"
+                    android:textSize="16sp"
+                    android:padding="10dp"
+                    android:autofillHints="none" />
+
+                <Button
+                    android:id="@+id/btnSaveWeight"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:text="Save Weight"
+                    android:layout_marginTop="12dp"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
