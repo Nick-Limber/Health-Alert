@@ -186,10 +186,16 @@ class AccountPage : AppCompatActivity() {
 
                 runOnUiThread {
                     if (response.isSuccessful) {
+                        //clears local session data
+                        val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+                        sharedPref.edit().clear().apply()
+
                         Toast.makeText(this@AccountPage, "Account has been deleted.", Toast.LENGTH_LONG).show()
 
+                        //heads to start activity
                         val intent = Intent(this@AccountPage, MainActivity::class.java)
 
+                        //clear the history so back doesnt work
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                         finish()
