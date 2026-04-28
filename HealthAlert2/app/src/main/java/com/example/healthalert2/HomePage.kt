@@ -27,6 +27,13 @@ class HomePage : AppCompatActivity() {
     private lateinit var inputProtein: EditText
     private lateinit var inputCarbs: EditText
 
+
+    //Exercise inputs
+    private lateinit var inputExerciseName: EditText
+    private lateinit var inputSets: EditText
+    private lateinit var inputReps: EditText
+    private lateinit var inputExerciseWeight: EditText
+
     private val client = OkHttpClient()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,8 +46,15 @@ class HomePage : AppCompatActivity() {
         inputProtein = findViewById(R.id.inputProtein)
         inputCarbs = findViewById(R.id.inputCarbs)
 
+        //added by NNicholas - for exercise
+        inputExerciseName = findViewById(R.id.inputExerciseName)
+        inputSets = findViewById(R.id.inputSets)
+        inputReps = findViewById(R.id.inputReps)
+        inputExerciseWeight = findViewById(R.id.inputExerciseWeight)
+
         val logMealBtn = findViewById<Button>(R.id.logMealBtn)
         val saveWeightBtn = findViewById<Button>(R.id.btnSaveWeight)
+        val btnSaveExercise = findViewById<Button>(R.id.btnSaveWeight)
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
         // 2. Button Listeners
@@ -63,6 +77,22 @@ class HomePage : AppCompatActivity() {
 
         saveWeightBtn.setOnClickListener {
             showWeightEntryDialoug()
+        }
+
+        btnSaveExercise.setOnClickListener {
+            val exercise_name = inputExerciseName.text.toString().trim()
+            val sets = inputSets.text.toString().trim()
+            val reps = inputReps.text.toString().trim()
+            val weightUsed = inputExerciseWeight.text.toString().trim()
+
+            if (exercise_name.isNotEmpty() && sets.isNotEmpty() && reps.isNotEmpty() && weightUsed.isNotEmpty())
+            {
+                saveExerciseToDatabase(exercise_name, sets, reps, weightUsed)
+            }
+            else
+            {
+                Toast.makeText(this, "Please fill in all exercise fields", Toast.LENGTH_SHORT).show()
+            }
         }
 
         // 3. Navigation
@@ -171,6 +201,51 @@ class HomePage : AppCompatActivity() {
                         Toast.makeText(this@HomePage, "Weight synced", Toast.LENGTH_LONG).show()
                     } else {
                         Toast.makeText(this@HomePage, "Failed: ${response.code}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun saveExerciseToDatabase(exercise_name: String, sets: String, reps: String, weightUsed: String)
+    {
+        val url = "https://gleaming-sparkle-production-acb6.up.railway.app/health/log-exercise"
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val userId = prefs.getInt("current_user_id:", 5)
+
+        val jsonPayload = """
+            {
+                "profile_id": $userId,
+                "exercise_name": "$exercise_name",
+                "sets": $sets,
+                "reps": $reps,
+                "weight": $weightUsed
+            }
+        """.trimIndent()
+
+        val body = jsonPayload.toRequestBody("application/json; charset=utf-8".toMediaType())
+        val request = Request.Builder().url(url).post(body).build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: okio.IOException) {
+                runOnUiThread { Toast.makeText(this@HomePage, "Server Error", Toast.LENGTH_SHORT).show() }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseCode = response.code
+                runOnUiThread {
+                    if (response.isSuccessful)
+                    {
+                        Toast.makeText(this@HomePage, "Exercise Saved!", Toast.LENGTH_SHORT).show()
+                        inputExerciseName.text.clear()
+                        inputSets.text.clear()
+                        inputReps.text.clear()
+                        inputExerciseWeight.text.clear()
+                    }
+                    else
+                    {
+                        Log.e("SERVER_ERROR", "Code: $responseCode")
+                        Toast.makeText(this@HomePage, "Failed to save exercise", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
