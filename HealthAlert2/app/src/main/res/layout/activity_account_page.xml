@@ -112,6 +112,26 @@
                     android:paddingStart="20dp"/>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Added by Nicholas - Delete Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/deleteAccountContainer"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:strokeColor="#26A69A"
+                app:strokeWidth="2dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:paddingStart="20dp"
+                    android:text="Delete Account"
+                    android:textColor="#D32F2F"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
 
     </FrameLayout>

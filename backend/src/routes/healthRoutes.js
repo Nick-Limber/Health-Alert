@@ -3,12 +3,12 @@ import { db_pool } from "../config/db.js";
 
 const router = express.Router();
 
-router.get("/pastdata", async (req, res) => {
+router.get("/all-history/:profile_id", async (req, res) => {
     try {
-        const profileId = req.query.profile_id;
-        console.log("--New REQUEST FOR PROFILE_ID:", profileId);
+        const { profile_id } = req.params;
+        console.log("--New REQUEST FOR PROFILE_ID:", profile_id);
 
-        if (!profileId) {
+        if (!profile_id) {
             return res.json({
 
                 //sample data
@@ -29,26 +29,30 @@ router.get("/pastdata", async (req, res) => {
                 ]
             })
         }
+        
         //weight
         const [weights] = await db_pool.query(
             `SELECT weight, recorded_at
              FROM personal_information
-             WHERE profile_id = ?` ,
-            [profileId]
+             WHERE profile_id = ?
+             ORDER BY recorded_at DESC`,
+            [profile_id]
         );
         //nutrition
         const [nutrition] = await db_pool.query(
             `SELECT recorded_at, diet_name, calories, protein, carbohydrates 
              FROM diets
-             WHERE profile_id = ?`,
-            [profileId]
+             WHERE profile_id = ?
+             ORDER BY recorded_at DESC`,
+            [profile_id]
         );
         //exercise
         const [exercise] = await db_pool.query(
             `SELECT recorded_at, exercise_type, sets, reps, weight
              FROM exercise
-             WHERE profile_id = ?`,
-            [profileId]
+             WHERE profile_id = ?
+             ORDER BY recorded_at DESC`,
+            [profile_id]
         );
 
         res.json({
@@ -58,10 +62,48 @@ router.get("/pastdata", async (req, res) => {
         });
     }
     catch (err) {
-        console.log("❌ ERROR IN HEALTH ROUTE:");
+        console.log("ERROR IN HEALTH ROUTE:");
         console.error(err); // This prints the full red error in the terminal
         res.status(500).send("Database Error: " + err.message);
     }
 
 });
+
+//new route for home page
+router.post("/log-weight", async (req, res) => {
+    try {
+        const { profile_id, weight } = req.body;
+
+        console.log(`-- NEW WEIGHT LOG REQUEST: Profile ${profile_id}, Weight: ${weight}`);
+
+        //validation
+        if (!profile_id || !weight) {
+            return res.status(400).json({ 
+                success: false,
+                error: "Missing profile_id or weight value."
+            });
+        }
+
+        const query = `
+            INSERT INTO personal_information (profile_id, weight, height, recorded_at)
+            VALUES (?, ?, 0, NOW())
+        `;
+
+        const [result] = await db_pool.query(query, [profile_id, weight]);
+
+        res.status(200).json({
+            success: true,
+            message: "Weight logged successfully.",
+            id: result.insertId
+        });
+    } catch (err) {
+        console.log("ERROR IN HEALTH POST ROUTE:");
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            error: "Database error: " + err.message
+        });
+    }
+});
+ 
 export default router;

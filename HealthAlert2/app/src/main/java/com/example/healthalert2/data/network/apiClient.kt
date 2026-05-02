@@ -42,4 +42,9 @@ object RetrofitClient {
     val registerApiService:RegisterApiService by lazy {
         retrofit.create(RegisterApiService::class.java)
     }
+
+    val addDietApiService:AddDietApiService by lazy {
+        retrofit.create(AddDietApiService::class.java)
+    }
+
 }
