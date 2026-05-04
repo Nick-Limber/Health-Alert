@@ -158,6 +158,7 @@ class HomePage : AppCompatActivity() {
                     inputCalories.text.clear()
                     inputProtein.text.clear()
                     inputCarbs.text.clear()
+                    fetchDietSummary()
                 } else {
                     val errorBody = response.errorBody()?.string() ?: "Unknown error"
                     Toast.makeText(this@HomePage, "Error: $errorBody", Toast.LENGTH_LONG).show()
