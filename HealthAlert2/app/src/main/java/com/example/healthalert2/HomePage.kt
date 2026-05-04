@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.healthalert2.data.network.AddDietRequest
 import com.example.healthalert2.data.network.RetrofitClient
+import com.example.healthalert2.data.network.getDietsResponse
+import com.example.healthalert2.databinding.ActivityHomePageBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 import okhttp3.*
@@ -26,12 +28,25 @@ class HomePage : AppCompatActivity() {
     private lateinit var inputCalories: EditText
     private lateinit var inputProtein: EditText
     private lateinit var inputCarbs: EditText
+    lateinit var prefs: android.content.SharedPreferences
+
+    private lateinit var binding: ActivityHomePageBinding
+    private val dietService = RetrofitClient.dietApiService
+
+
 
     private val client = OkHttpClient()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
+        prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+
+        // 1. Initialize the binding FIRST
+        binding = ActivityHomePageBinding.inflate(layoutInflater)
+
+        // 2. Set the content view using the binding root
+        setContentView(binding.root)
 
         // 1. Initialize Views
         inputName = findViewById(R.id.inputName)
@@ -42,6 +57,10 @@ class HomePage : AppCompatActivity() {
         val logMealBtn = findViewById<Button>(R.id.logMealBtn)
         val saveWeightBtn = findViewById<Button>(R.id.btnSaveWeight)
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+
+        // Get username to display
+        val name = prefs.getString("user_name", "User")
+        binding.headerTitle.text = "Welcome, $name"
 
         // 2. Button Listeners
         logMealBtn.setOnClickListener {
@@ -90,6 +109,36 @@ class HomePage : AppCompatActivity() {
         }
     } // End of onCreate
 
+
+
+    // Allow recent nutrition to run everytime activity is opened
+    override fun onResume() {
+        super.onResume()
+        fetchDietSummary()
+    }
+
+    private fun fetchDietSummary() {
+        lifecycleScope.launch {
+            try {
+                val token = prefs.getString("auth_token", null)
+                val final_token = "Bearer " + token
+                val response = dietService.getDiets(final_token)
+                if (response.isSuccessful && response.body() != null) {
+                    updateUI(response.body()!!)
+                }
+            } catch (e: Exception) {
+                Log.e("API_ERROR", "Failed to fetch: ${e.message}")
+            }
+        }
+    }
+
+    private fun updateUI(data: getDietsResponse) {
+        // Update your UI elements safely
+        binding.caloriesValue.text = "${data.calories}"
+        binding.proteinValue.text = "${data.protein}g"
+        binding.carbsValue.text = "${data.carbs}g"
+    }
+
     // --- MEAL LOGGING (Retrofit) ---
     private fun saveMealToDatabase(name: String, calories: Int, protein: Int, carbs: Int) {
         val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
@@ -98,7 +147,7 @@ class HomePage : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val response = RetrofitClient.addDietApiService.AddDiet(
+                val response = RetrofitClient.dietApiService.addDiet(
                     authHeader,
                     AddDietRequest(name, calories, protein, carbs)
                 )

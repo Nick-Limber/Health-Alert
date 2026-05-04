@@ -9,7 +9,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "https://gleaming-sparkle-production-acb6.up.railway.app/"
+    private const val BASE_URL = "http://10.0.2.2:5005/"
 
     private val moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
@@ -43,8 +43,8 @@ object RetrofitClient {
         retrofit.create(RegisterApiService::class.java)
     }
 
-    val addDietApiService:AddDietApiService by lazy {
-        retrofit.create(AddDietApiService::class.java)
+    val dietApiService:DietApiService by lazy {
+        retrofit.create(DietApiService::class.java)
     }
 
 }
