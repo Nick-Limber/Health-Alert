@@ -46,7 +46,7 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const login_SQL = "SELECT profile_id, password FROM profile WHERE email = ? LIMIT 1";
+        const login_SQL = "SELECT profile_id, password, username FROM profile WHERE email = ? LIMIT 1";
         const [rows] = await db_pool.execute(login_SQL, [email]);
 
         if (!rows || rows.length === 0) {
@@ -67,7 +67,8 @@ const login = async (req, res) => {
             data: {
                 user: {
                     id: rows[0].profile_id,
-                    email: email
+                    email: email,
+                    username: rows[0].username
                 },
                 token,
             },
