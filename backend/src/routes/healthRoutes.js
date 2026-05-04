@@ -3,12 +3,12 @@ import { db_pool } from "../config/db.js";
 
 const router = express.Router();
 
-router.get("/pastdata", async (req, res) => {
+router.get("/all-history/:profile_id", async (req, res) => {
     try {
-        const profileId = req.query.profile_id;
-        console.log("--New REQUEST FOR PROFILE_ID:", profileId);
+        const { profile_id } = req.params;
+        console.log("--New REQUEST FOR PROFILE_ID:", profile_id);
 
-        if (!profileId) {
+        if (!profile_id) {
             return res.json({
 
                 //sample data
@@ -29,26 +29,30 @@ router.get("/pastdata", async (req, res) => {
                 ]
             })
         }
+        
         //weight
         const [weights] = await db_pool.query(
             `SELECT weight, recorded_at
              FROM personal_information
-             WHERE profile_id = ?` ,
-            [profileId]
+             WHERE profile_id = ?
+             ORDER BY recorded_at DESC`,
+            [profile_id]
         );
         //nutrition
         const [nutrition] = await db_pool.query(
             `SELECT recorded_at, diet_name, calories, protein, carbohydrates 
              FROM diets
-             WHERE profile_id = ?`,
-            [profileId]
+             WHERE profile_id = ?
+             ORDER BY recorded_at DESC`,
+            [profile_id]
         );
         //exercise
         const [exercise] = await db_pool.query(
             `SELECT recorded_at, exercise_type, sets, reps, weight
              FROM exercise
-             WHERE profile_id = ?`,
-            [profileId]
+             WHERE profile_id = ?
+             ORDER BY recorded_at DESC`,
+            [profile_id]
         );
 
         res.json({

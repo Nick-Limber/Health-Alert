@@ -2,6 +2,7 @@ package com.example.healthalert2;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -149,9 +150,34 @@ public class ViewPastDataActivity extends AppCompatActivity {
         });
     }
 
+    private int getUserIdFromToken(String token) {
+        try {
+            String[] parts = token.split("\\.");
+            if (parts.length < 2) return 1;
+
+            byte[] decodedBytes = android.util.Base64.decode(parts[1], Base64.URL_SAFE);
+            String payload = new String(decodedBytes);
+
+            org.json.JSONObject json = new org.json.JSONObject(payload);
+
+            if (json.has("userID")) return json.getInt("userId");
+            if (json.has("id")) return json.getInt("id");
+            if (json.has("profile_id")) return json.getInt("profile_id");
+        } catch (Exception e) {
+            Log.e("TOKEN_DECODE", "Error decoding token: " +e.getMessage());
+        }
+        return 1;
+    }
+
     private void fetchPastDataFromBackend() {
-        int loggedInUserId = 1;
-        String url = "https://gleaming-sparkle-production-acb6.up.railway.app/"; //backend endpoint
+        android.content.SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+        String token = prefs.getString("auth_token", "");
+
+        int userId = getUserIdFromToken(token);
+
+        String url = "https://gleaming-sparkle-production-acb6.up.railway.app/health/all-history/" + userId; //backend endpoint
+
+        Log.d("APP_DEBUG", "Fetching data for user: " +userId + " from URL: " + url);
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -238,6 +264,11 @@ public class ViewPastDataActivity extends AppCompatActivity {
                 },
                 error -> {
                     error.printStackTrace();
+                    String message = "Network Error";
+                    if (error.networkResponse != null)
+                    {
+                        message += " (Status: " + error.networkResponse.statusCode + ")";
+                    }
                     android.widget.Toast.makeText(ViewPastDataActivity.this, "Network Error", Toast.LENGTH_LONG).show();
                 }
 

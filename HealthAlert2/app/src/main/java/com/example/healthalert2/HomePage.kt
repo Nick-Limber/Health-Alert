@@ -163,9 +163,13 @@ class HomePage : AppCompatActivity() {
     private fun performWeightUpdate(weight: String) {
         val url = "https://gleaming-sparkle-production-acb6.up.railway.app/health/log-weight"
 
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val userId = prefs.getInt("current_user_id:", 5)
+
         val jsonPayload = """
             {
-                "profile_id": 1,
+                "profile_id": $userId
+                ,
                 "weight": $weight
             }
         """.trimIndent()
