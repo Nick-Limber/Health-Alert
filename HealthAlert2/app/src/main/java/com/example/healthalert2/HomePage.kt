@@ -1,6 +1,5 @@
 package com.example.healthalert2
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -13,8 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.healthalert2.data.network.AddDietRequest
 import com.example.healthalert2.data.network.RetrofitClient
+import com.example.healthalert2.data.network.getDietsResponse
 import com.example.healthalert2.databinding.ActivityHomePageBinding
-import com.example.healthalert2.databinding.ActivityLoginPageBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 import okhttp3.*
@@ -32,6 +31,8 @@ class HomePage : AppCompatActivity() {
     lateinit var prefs: android.content.SharedPreferences
 
     private lateinit var binding: ActivityHomePageBinding
+    private val dietService = RetrofitClient.dietApiService
+
 
 
     private val client = OkHttpClient()
@@ -39,7 +40,6 @@ class HomePage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
-
         prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
 
         // 1. Initialize the binding FIRST
@@ -109,6 +109,36 @@ class HomePage : AppCompatActivity() {
         }
     } // End of onCreate
 
+
+
+    // Allow recent nutrition to run everytime activity is opened
+    override fun onResume() {
+        super.onResume()
+        fetchDietSummary()
+    }
+
+    private fun fetchDietSummary() {
+        lifecycleScope.launch {
+            try {
+                val token = prefs.getString("auth_token", null)
+                val final_token = "Bearer " + token
+                val response = dietService.getDiets(final_token)
+                if (response.isSuccessful && response.body() != null) {
+                    updateUI(response.body()!!)
+                }
+            } catch (e: Exception) {
+                Log.e("API_ERROR", "Failed to fetch: ${e.message}")
+            }
+        }
+    }
+
+    private fun updateUI(data: getDietsResponse) {
+        // Update your UI elements safely
+        binding.caloriesValue.text = "${data.calories}"
+        binding.proteinValue.text = "${data.protein}g"
+        binding.carbsValue.text = "${data.carbs}g"
+    }
+
     // --- MEAL LOGGING (Retrofit) ---
     private fun saveMealToDatabase(name: String, calories: Int, protein: Int, carbs: Int) {
         val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
@@ -117,7 +147,7 @@ class HomePage : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val response = RetrofitClient.addDietApiService.AddDiet(
+                val response = RetrofitClient.dietApiService.addDiet(
                     authHeader,
                     AddDietRequest(name, calories, protein, carbs)
                 )
