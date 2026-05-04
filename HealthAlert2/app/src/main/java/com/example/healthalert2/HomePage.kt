@@ -1,5 +1,6 @@
 package com.example.healthalert2
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.healthalert2.data.network.AddDietRequest
 import com.example.healthalert2.data.network.RetrofitClient
+import com.example.healthalert2.databinding.ActivityHomePageBinding
+import com.example.healthalert2.databinding.ActivityLoginPageBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 import okhttp3.*
@@ -26,12 +29,24 @@ class HomePage : AppCompatActivity() {
     private lateinit var inputCalories: EditText
     private lateinit var inputProtein: EditText
     private lateinit var inputCarbs: EditText
+    lateinit var prefs: android.content.SharedPreferences
+
+    private lateinit var binding: ActivityHomePageBinding
+
 
     private val client = OkHttpClient()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
+
+        prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+
+        // 1. Initialize the binding FIRST
+        binding = ActivityHomePageBinding.inflate(layoutInflater)
+
+        // 2. Set the content view using the binding root
+        setContentView(binding.root)
 
         // 1. Initialize Views
         inputName = findViewById(R.id.inputName)
@@ -42,6 +57,10 @@ class HomePage : AppCompatActivity() {
         val logMealBtn = findViewById<Button>(R.id.logMealBtn)
         val saveWeightBtn = findViewById<Button>(R.id.btnSaveWeight)
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+
+        // Get username to display
+        val name = prefs.getString("user_name", "User")
+        binding.headerTitle.text = "Welcome, $name"
 
         // 2. Button Listeners
         logMealBtn.setOnClickListener {
