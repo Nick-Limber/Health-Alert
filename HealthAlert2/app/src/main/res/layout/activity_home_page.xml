@@ -4,8 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#D4D4D4">
+    android:background="#FAFAFA">
 
+    <!-- Welcome Username part-->
     <TextView
         android:id="@+id/headerTitle"
         android:layout_width="wrap_content"
@@ -13,9 +14,24 @@
         android:text="Welcome Username"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="65dp"
-        android:textColor="#333333"/>
+        android:textColor="#333333"
+
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="75dp"/>
+
+    <!-- LOGO -->
+
+    <ImageView
+        android:id="@+id/appLogo"
+        android:layout_width="83dp"
+        android:layout_height="100dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="45dp"
+
+        android:layout_marginEnd="16dp"
+        android:contentDescription="App Logo"
+        android:src="@drawable/logo" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -29,24 +45,23 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginBottom="12dp"
-                android:layout_weight="1"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="8dp"
-                app:cardUseCompatPadding="true">
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="10dp"
+            app:cardUseCompatPadding="true"
+            app:cardBackgroundColor="#E3EAF2">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#FFFFFF"
-                    android:baselineAligned="false"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+            <LinearLayout
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:baselineAligned="false">
 
                     <!-- HEADER -->
                     <TextView
@@ -76,95 +91,95 @@
                         android:orientation="horizontal"
                         android:weightSum="3">
 
-                        <!-- CALORIES -->
-                        <LinearLayout
-                            android:layout_width="0dp"
+                    <!-- CALORIES -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/caloriesValue"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="vertical">
+                            android:text="0"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="#6A1B9A"/>
 
-                            <TextView
-                                android:id="@+id/caloriesValue"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textColor="#6A1B9A"
-                                android:textSize="22sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Calories"
-                                android:textColor="#666666"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-
-                        <!-- PROTEIN -->
-                        <LinearLayout
-                            android:layout_width="0dp"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="vertical">
+                            android:text="Calories"
+                            android:textSize="12sp"
+                            android:textColor="#666666"/>
+                    </LinearLayout>
 
-                            <TextView
-                                android:id="@+id/proteinValue"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0g"
-                                android:textColor="#00ACC1"
-                                android:textSize="22sp"
-                                android:textStyle="bold" />
+                    <!-- PROTEIN -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Protein"
-                                android:textColor="#666666"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-
-                        <!-- CARBS -->
-                        <LinearLayout
-                            android:layout_width="0dp"
+                        <TextView
+                            android:id="@+id/proteinValue"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="vertical">
+                            android:text="0g"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="#00ACC1"/>
 
-                            <TextView
-                                android:id="@+id/carbsValue"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0g"
-                                android:textColor="#1E88E5"
-                                android:textSize="22sp"
-                                android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Protein"
+                            android:textSize="12sp"
+                            android:textColor="#666666"/>
+                    </LinearLayout>
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Carbs"
-                                android:textColor="#666666"
-                                android:textSize="12sp" />
-                        </LinearLayout>
+                    <!-- CARBS -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
 
+                        <TextView
+                            android:id="@+id/carbsValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0g"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="#1E88E5"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Carbs"
+                            android:textSize="12sp"
+                            android:textColor="#666666"/>
                     </LinearLayout>
 
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
+            </LinearLayout>
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginBottom="12dp"
-                android:layout_weight="1"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="8dp">
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:cardBackgroundColor="#E3EAF2"
+            android:layout_marginBottom="15dp"
+            app:cardCornerRadius="15dp"
+            app:cardElevation="10dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -172,82 +187,80 @@
                     android:orientation="vertical"
                     android:padding="20dp" />
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:text="Meals"
-                        android:textColor="#333333"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <Button
-                        android:id="@+id/logMealBtn"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:text="Log Meal"
-                        android:textSize="12sp" />
-
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/inputName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Enter Meal Name"
-                        android:inputType="text"
-                        android:textSize="14sp" />
-
-                    <EditText
-                        android:id="@+id/inputCalories"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Enter Calories"
-                        android:inputType="number"
-                        android:textSize="14sp" />
-
-                    <EditText
-                        android:id="@+id/inputProtein"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Enter Protein"
-                        android:inputType="number"
-                        android:textSize="14sp" />
-
-                    <EditText
-                        android:id="@+id/inputCarbs"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Enter Carbs"
-                        android:inputType="number"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginBottom="12dp"
-                android:layout_weight="1"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="8dp"
-                app:cardUseCompatPadding="true">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Meals"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"/>
+
+                <Button
+                    android:id="@+id/logMealBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Log Meal"
+                    android:textSize="12sp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <EditText
+                    android:id="@+id/inputName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Meal Name"
+                    android:inputType="text"
+                    android:textSize="14sp"/>
+
+                <EditText
+                    android:id="@+id/inputCalories"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Calories"
+                    android:inputType="number"
+                    android:textSize="14sp"/>
+
+                <EditText
+                    android:id="@+id/inputProtein"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Protein"
+                    android:inputType="number"
+                    android:textSize="14sp"/>
+
+                <EditText
+                    android:id="@+id/inputCarbs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Carbs"
+                    android:inputType="number"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:cardCornerRadius="15dp"
+            app:cardBackgroundColor="#E3EAF2"
+            app:cardElevation="10dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"

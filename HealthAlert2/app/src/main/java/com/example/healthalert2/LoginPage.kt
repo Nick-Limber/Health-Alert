@@ -1,5 +1,6 @@
 package com.example.healthalert2
 
+import android.content.Context
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
@@ -19,7 +20,8 @@ import com.example.healthalert2.data.network.LoginRequest
 import com.example.healthalert2.data.network.RetrofitClient
 import kotlinx.coroutines.launch
 import com.example.healthalert2.data.network.LoginApiService
-
+import com.example.healthalert2.databinding.ActivityHomePageBinding
+import com.example.healthalert2.databinding.ActivityLoginPageBinding
 
 class LoginPage : AppCompatActivity() {
 
@@ -30,6 +32,8 @@ class LoginPage : AppCompatActivity() {
 
     lateinit var prefs: android.content.SharedPreferences
     lateinit var editor: android.content.SharedPreferences.Editor
+
+    private lateinit var binding: ActivityLoginPageBinding
     // Bottom Navigation
     //private lateinit var bottomNavigationView: BottomNavigationView
 
@@ -39,6 +43,14 @@ class LoginPage : AppCompatActivity() {
     //private val accountFragment = AccountFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        // 1. Inflate the layout
+        binding = ActivityLoginPageBinding.inflate(layoutInflater)
+
+        // 2. Set the content view to the binding root
+        setContentView(binding.root)
+
+
         super.onCreate(savedInstanceState)
         this.enableEdgeToEdge()
         setContentView(R.layout.activity_login_page) //changed this from activity_main to login_page fixed R.id.----- errors below
@@ -62,11 +74,20 @@ class LoginPage : AppCompatActivity() {
 
                     if (response.isSuccessful) { val loginResponse = response.body()
                         val token = loginResponse?.data?.token
+                        val username = loginResponse?.data?.user?.username
+
                         if (token != null) {
                             Log.d("LOGIN_DEBUG", "Success! Saving token and switching.")
 
                             editor.putString("auth_token", token)
                             editor.apply()
+
+                            val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+                            with (prefs.edit()) {
+                                putString("user_name", username)
+                                apply()
+                            }
+
 
                             Toast.makeText(this@LoginPage, "Login Successful!", Toast.LENGTH_SHORT).show()
 
@@ -103,5 +124,6 @@ class LoginPage : AppCompatActivity() {
          //   )
         //    insets
        // }
-    }
-}
+    }}
+// Change to push in order to update server can delete after
+// another change to update server
