@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import { db_pool } from "../config/db.js";
 
-console.log("Auth Header Recieved:", req.headers.authorization); 
 
 const verificationMiddleware = async (req, res, next) => {
     let token;
