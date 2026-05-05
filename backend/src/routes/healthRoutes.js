@@ -5,7 +5,7 @@ import { verificationMiddleware } from "../middleware/verificationMiddleware.js"
 const router = express.Router();
 console.log(" HEALTH ROUTES HAVE SUCCESSFULLY LOADED INTO MEMORY ");
 
-router.get("/all-history/", verificationMiddleware, async (req, res) => {
+router.get("/all-history", verificationMiddleware, async (req, res) => {
     try {
         const  profile_id  = req.user;
         console.log("--New REQUEST FOR PROFILE_ID:", profile_id);
