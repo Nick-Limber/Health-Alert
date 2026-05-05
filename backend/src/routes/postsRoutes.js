@@ -6,11 +6,11 @@ const router = express.Router();
 // CREATE a new post (andriod studio to mysql)
 router.post("/", async (req, res) => {
     try {
-        const { userId, title, content } = req.body;
+        const { profile_id, title, content } = req.body;
 
         const [result] = await db_pool.query(
-            "INSERT INTO Posts (userId, title, content) VALUES (?, ?, ?)",
-            [userId, title, content]
+            "INSERT INTO Posts (profile_id, title, content) VALUES (?, ?, ?)",
+            [profile_id, title, content]
         );
 
         res.status(201).json({
@@ -23,15 +23,26 @@ router.post("/", async (req, res) => {
     }
 });
 // GET all posts (Mysql to andriod studio)
+
 router.get("/", async (req, res) => {
+
     try {
-        const [rows] = await db_pool.query("SELECT * FROM Posts");
+        // Join with your users/profiles table to get the username
+        const sql = `
+                SELECT p.*, pr.username 
+                FROM Posts p 
+                JOIN profile pr ON p.profile_id = pr.profile_id 
+                `;
+        const [rows] = await db_pool.query(sql);
+
+        console.log(rows[0].postId);
         res.json(rows);
     } catch (error) {
-        console.error(error);
         res.status(500).json({ error: "Database error" });
     }
 });
+
+
 //to UPDATE posts
 router.put("/:id", async (req, res) => {
     const postId = req.params.id;
@@ -82,16 +93,25 @@ router.get("/:postId/replies", async (req, res) => {
 router.post("/:postId/replies", async (req, res) => {
     try {
         const { postId } = req.params;
-        const { userId, content } = req.body;
+        const { profile_id, content } = req.body;
 
-        if (!userId || !content) {
+        console.log(profile_id);
+
+
+        if (!profile_id || !content) {
             return res.status(400).json({ message: "Missing userId or content" });
         }
 
+        console.log(postId);
+        console.log(profile_id);
+        console.log(content);
+
         const [result] = await db_pool.query(
-            "INSERT INTO replies (postId, userId, content) VALUES (?, ?, ?)",
-            [postId, userId, content]
+            "INSERT INTO replies (postId, profile_id, content) VALUES (?, ?, ?)",
+            [postId, profile_id, content]
         );
+
+        console.log(result.insertId);
 
         res.status(201).json({ message: "Reply added", replyId: result.insertId });
     } catch (error) {
