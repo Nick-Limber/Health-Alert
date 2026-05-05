@@ -72,19 +72,18 @@ router.get("/all-history/:profile_id", async (req, res) => {
 });
 
 //new route for home page
-router.post("/log-weight", async (req, res) => {
+router.post("/log-weight", verificationMiddleware,async (req, res) => {
     try {
-        const { profile_id, weight } = req.body;
+        const profile_id = req.user;
+        const { weight } = req.body;
 
         console.log(`-- NEW WEIGHT LOG REQUEST: Profile ${profile_id}, Weight: ${weight}`);
 
-        //validation
-        if (!profile_id || !weight) {
-            return res.status(400).json({ 
-                success: false,
-                error: "Missing profile_id or weight value."
-            });
-        }
+    if (weight === undefined || weight === null) {
+        return res.status(400).json({
+            error: "Weight value is required."
+        });
+    }
 
         const query = `
             INSERT INTO personal_information (profile_id, weight, height, recorded_at)
