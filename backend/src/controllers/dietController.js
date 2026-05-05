@@ -25,16 +25,22 @@ const getDiets = async (req, res) => {
         const profile_id = req.user;
 
         const sql = "SELECT SUM(calories) AS total_calories, SUM(protein) AS total_protein, SUM(carbohydrates) AS total_carbs FROM (SELECT calories, protein, carbohydrates FROM diets WHERE profile_id = ? ORDER BY recorded_at DESC LIMIT 5) AS recent_entries";
-        const [result] = db_pool.execute(sql, profile_id);
+        const [rows] = await db_pool.execute(sql, [profile_id]);
+        const result = rows[0];
 
         const total_calories = result.total_calories;
         const total_protein = result.total_protein;
         const total_carbs = result.total_carbs;
 
-        res.status(201).json({ success: "True" })
+        res.status(201).json({
+            success: "True",
+            calories: total_calories,
+            protein: total_protein,
+            carbs: total_carbs
+        })
 
     } catch (error) {
-        res.status(500).json({ message: "Unable to save diet to database.", error: `${error}` });
+        res.status(500).json({ message: "Unable to get diets to database.", error: `${error}` });
     }
 
 }

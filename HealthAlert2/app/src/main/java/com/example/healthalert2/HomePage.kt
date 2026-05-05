@@ -50,6 +50,7 @@ class HomePage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        fetchDietSummary()
 
         // 1. Initialize the binding FIRST
         binding = ActivityHomePageBinding.inflate(layoutInflater)
@@ -88,6 +89,7 @@ class HomePage : AppCompatActivity() {
 
             if (name.isNotEmpty() && calories != null && protein != null && carbs != null) {
                 saveMealToDatabase(name, calories, protein, carbs)
+                fetchDietSummary()
             } else {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 if (name.isEmpty()) inputName.error = "Required"
