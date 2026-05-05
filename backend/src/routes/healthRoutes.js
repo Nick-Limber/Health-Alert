@@ -2,7 +2,7 @@ import express from "express";
 import { db_pool } from "../config/db.js";
 
 const router = express.Router();
-console.log("🚨 HEALTH ROUTES HAVE SUCCESSFULLY LOADED INTO MEMORY 🚨");
+console.log(" HEALTH ROUTES HAVE SUCCESSFULLY LOADED INTO MEMORY ");
 
 router.get("/all-history/:profile_id", async (req, res) => {
     try {
@@ -110,7 +110,8 @@ router.post("/log-weight", async (req, res) => {
 //new route for home page
 router.post("/log-exercise", async (req, res) => {
     try {
-        const { profile_id, exercise_type, sets, reps, weight } = req.body;
+        const profile_id = req.user; 
+        const { exercise_type, sets, reps, weight } = req.body;
 
         console.log(`-- NEW EXERCISE LOG REQUEST: Profile ${profile_id}, Exercise: ${exercise_type}, Sets: ${sets}, Reps: ${reps}, Weight: ${weight}`);
 
