@@ -5,32 +5,10 @@ import { verificationMiddleware } from "../middleware/verificationMiddleware.js"
 const router = express.Router();
 console.log(" HEALTH ROUTES HAVE SUCCESSFULLY LOADED INTO MEMORY ");
 
-router.get("/all-history/:profile_id", async (req, res) => {
+router.get("/all-history/", verificationMiddleware, async (req, res) => {
     try {
-        const { profile_id } = req.params;
+        const  profile_id  = req.user;
         console.log("--New REQUEST FOR PROFILE_ID:", profile_id);
-
-        if (!profile_id) {
-            return res.json({
-
-                //sample data
-                weights: [
-                    { weight: 200, recorded_at: "2026-03-01 10:45:11" },
-                    { weight: 190, recorded_at: "2026-03-02 11:30:33" },
-                    { weight: 175, recorded_at: "2026-03-07 11:30:33" }
-                ],
-
-                nutrition: [
-                    { recorded_at: "2026-03-01 09:13:15", calories: 200, protein: 15, carbohydrates: 30 },
-                    { recorded_at: "2026-03-02 12:13:15", calories: 450, protein: 50, carbohydrates: 30 }
-                ],
-
-                exercise: [
-                    { recorded_at: "2026-03-25 05:44:30", exercise_type: "Bench Press", sets: 4, reps: 10, weight: 225 },
-                    { recorded_at: "2026-03-25 05:44:30", exercise_type: "Squat", sets: 5, reps: 5, weight: 250 }
-                ]
-            })
-        }
         
         //weight
         const [weights] = await db_pool.query(
