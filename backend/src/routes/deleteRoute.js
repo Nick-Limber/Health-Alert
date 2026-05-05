@@ -55,6 +55,9 @@ router.delete("/delete-account", async (req, res) => {
         try {
             await connection.beginTransaction();
 
+            await connection.query("DELETE FROM workout_plans WHERE profile_id = ?",
+                [masterId]);
+
             await connection.query("DELETE FROM personal_information WHERE profile_id = ?",
                 [masterId]);
 
