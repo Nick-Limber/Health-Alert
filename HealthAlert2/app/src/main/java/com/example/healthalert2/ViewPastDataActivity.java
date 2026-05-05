@@ -10,21 +10,25 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.example.healthalert2.data.network.AllHistoryResponse;
+import com.example.healthalert2.data.network.ExerciseEntry;
+import com.example.healthalert2.data.network.NutritionEntry;
+import com.example.healthalert2.data.network.RetrofitClient;
+import com.example.healthalert2.data.network.WeightEntry;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import com.example.healthalert2.data.network.RetrofitClient;
+import com.example.healthalert2.data.network.AllHistoryResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ViewPastDataActivity extends AppCompatActivity {
 
@@ -46,74 +50,9 @@ public class ViewPastDataActivity extends AppCompatActivity {
         //set up nav bar
         setUpNavBar();
 
-        //temp data
-        //showSampleData();
-
         fetchPastDataFromBackend();
     }
 
-    /*private void showSampleData()
-    {
-        //sample weight
-        List<Float> weightValues = new ArrayList<>();
-        List<String> weightTimeStamps = new ArrayList<>();
-        List<String> weightLabels = new ArrayList<>();
-
-        weightValues.add(200f);
-        weightValues.add(190f);
-        weightValues.add(187f);
-
-        weightTimeStamps.add("2026-03-01 10:30:33");
-        weightTimeStamps.add("2026-03-02 11:12:55");
-        weightTimeStamps.add("2026-03-03 09:50:27");
-
-        weightLabels.add("March 1");
-        weightLabels.add("March 2");
-        weightLabels.add("March 3");
-
-        graph.setData(weightValues, weightTimeStamps);
-
-        weightLabels.clear();
-
-        for (int i = 0; i < weightValues.size(); i++)
-        {
-            String rawTime = weightTimeStamps.get(i);
-            String day;
-
-            try {
-                SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd");
-                Date date = dbFormat.parse(rawTime);
-                day = displayFormat.format(date);
-            } catch (Exception e) {
-                day = rawTime;
-            }
-
-            weightLabels.add(day + ": " + weightValues.get(i) + " lbs");
-        }
-
-        weightList.setAdapter(new ArrayAdapter<>(
-                this, android.R.layout.simple_list_item_1, weightLabels
-        ));
-
-        //nutrition
-        List<String> nutritionString = new ArrayList<>();
-        nutritionString.add("March 1 - Keto - 2500 cals - 100g protein - 0g carbs");
-        nutritionString.add("March 2 - Low Cal - 1500 cals - 90g protein - 70g carbs");
-
-        nutritionList.setAdapter(new ArrayAdapter<>(
-                this, android.R.layout.simple_list_item_1, nutritionString
-        ));
-
-        //exercise
-        List<String> workoutStrings = new ArrayList<>();
-        workoutStrings.add("Bench Press - 5x5 - 225 lbs");
-        workoutStrings.add("Squat - 3x8 - 175 lbs");
-
-        workoutList.setAdapter(new ArrayAdapter<>(
-                this, android.R.layout.simple_list_item_1,workoutStrings
-        ));
-    }*/
 
     private void setUpNavBar() {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
@@ -150,144 +89,82 @@ public class ViewPastDataActivity extends AppCompatActivity {
         });
     }
 
-    private int getUserIdFromToken(String token) {
-        try {
-            String[] parts = token.split("\\.");
-            if (parts.length < 2) return 1;
-
-            byte[] decodedBytes = android.util.Base64.decode(parts[1], Base64.URL_SAFE);
-            String payload = new String(decodedBytes);
-
-            org.json.JSONObject json = new org.json.JSONObject(payload);
-
-            if (json.has("userID")) return json.getInt("userId");
-            if (json.has("id")) return json.getInt("id");
-            if (json.has("profile_id")) return json.getInt("profile_id");
-        } catch (Exception e) {
-            Log.e("TOKEN_DECODE", "Error decoding token: " +e.getMessage());
-        }
-        return 1;
-    }
-
-    private void fetchPastDataFromBackend() {
+    private void fetchPastDataFromBackend()
+    {
         android.content.SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         String token = prefs.getString("auth_token", "");
+        String authHeader = "Bearer " + token;
 
-        int userId = getUserIdFromToken(token);
+        Call<AllHistoryResponse> call = RetrofitClient.INSTANCE.getHealthApiService().getAllHistory(authHeader);
 
-        String url = "https://gleaming-sparkle-production-acb6.up.railway.app/health/all-history/" + userId; //backend endpoint
+        call.enqueue(new Callback<AllHistoryResponse>() {
+            @Override
+            public void onResponse(retrofit2.Call<AllHistoryResponse> call, retrofit2.Response<AllHistoryResponse> response) {
+                if (response.isSuccessful() && response.body() != null)
+                {
+                    AllHistoryResponse data = response.body();
 
-        Log.d("APP_DEBUG", "Fetching data for user: " +userId + " from URL: " + url);
+                    //process weights
+                    List<Float> weightValues = new ArrayList<>();
+                    List<String> weightTimeStamps = new ArrayList<>();
+                    List<String> weightLabels = new ArrayList<>();
 
-        RequestQueue queue = Volley.newRequestQueue(this);
-
-        StringRequest request = new StringRequest(Request.Method.GET, url,
-                respone -> {
-                    try {
-                        JSONObject json = new JSONObject(respone);
-
-                        //weight
-                        JSONArray weightArray = json.getJSONArray("weights");
-                        List<Float> weightValues = new ArrayList<>();
-                        List<String> weightTimeStamps = new ArrayList<>();
-                        List<String> weightLabels = new ArrayList<>();
-
-                        for (int i = 0; i < weightArray.length(); i++) {
-                            JSONObject entry = weightArray.getJSONObject(i);
-
-                            float weight = (float) entry.getDouble("weight");
-                            String rawTime = entry.getString("recorded_at");
-
-                            String cleanDate = formatDate(rawTime);
-
-                            weightValues.add(weight);
-                            weightTimeStamps.add(cleanDate);
-
-                            weightLabels.add(cleanDate + ": " + weight + " lbs");
-                        }
-
-                        graph.setData(weightValues, weightTimeStamps);
-
-                        weightList.setAdapter(new ArrayAdapter<>(
-                                this,
-                                android.R.layout.simple_list_item_1,
-                                weightLabels
-                        ));
-
-                        //nutrition
-                        JSONArray nutritionArray = json.getJSONArray("nutrition");
-                        List<String> nutritionStrings = new ArrayList<>();
-
-                        for (int i = 0; i < nutritionArray.length(); i++) {
-                            JSONObject entry = nutritionArray.getJSONObject(i);
-
-                            nutritionStrings.add(
-                                    formatDate(entry.getString("recorded_at")) + " - " +
-                                            entry.getString("diet_name") + " - " +
-                                            entry.getInt("calories") + " cals - " +
-                                            entry.getInt("protein") + "g protein - " +
-                                            entry.getInt("carbohydrates") + "g carbs"
-                            );
-                        }
-
-                        nutritionList.setAdapter(new ArrayAdapter<>(
-                                this,
-                                android.R.layout.simple_list_item_1,
-                                nutritionStrings
-                        ));
-
-                        //workouts
-                        JSONArray workoutArray = json.getJSONArray("exercise");
-                        List<String> workoutStrings = new ArrayList<>();
-
-                        for (int i = 0; i < workoutArray.length(); i++) {
-                            JSONObject entry = workoutArray.getJSONObject(i);
-
-                            workoutStrings.add(
-                                    formatDate(entry.getString("recorded_at")) + " - " +
-                                            entry.getString("exercise_type") + " - " +
-                                            entry.getInt("sets") + "x" +
-                                            entry.getInt("reps") + " - " +
-                                            entry.getInt("weight") + " lbs"
-                            );
-                        }
-
-                        workoutList.setAdapter(new ArrayAdapter<>(
-                                this,
-                                android.R.layout.simple_list_item_1,
-                                workoutStrings
-                        ));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        android.widget.Toast.makeText(ViewPastDataActivity.this, "JSON Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                },
-                error -> {
-                    error.printStackTrace();
-                    String message = "Network Error";
-                    if (error.networkResponse != null)
+                    for (WeightEntry entry : data.getWeights())
                     {
-                        message += " (Status: " + error.networkResponse.statusCode + ")";
+                        weightValues.add((float) entry.getWeight());
+                        String cleanDate = formatDate(entry.getRecorded_at());
+                        weightTimeStamps.add(cleanDate);
+                        weightLabels.add(cleanDate + ": " + entry.getWeight() + " lbs");
                     }
-                    android.widget.Toast.makeText(ViewPastDataActivity.this, "Network Error", Toast.LENGTH_LONG).show();
-                }
 
-        );
-        queue.add(request);
+                    graph.setData(weightValues, weightTimeStamps);
+                    weightList.setAdapter(new ArrayAdapter<>(ViewPastDataActivity.this,
+                            android.R.layout.simple_list_item_1, weightLabels));
+
+                    //process nutrition
+                    List<String> nutritionStrings = new ArrayList<>();
+                    for (NutritionEntry entry : data.getNutrition())
+                    {
+                        nutritionStrings.add(formatDate(entry.getRecorded_at()) + " - " + entry.getDiet_name() +
+                                " (" + entry.getCalories() + " cals - " +entry.getProtein() + " g protein - " + entry.getCarbohydrates() + " g carbs");
+                    }
+
+                    nutritionList.setAdapter(new ArrayAdapter<>(ViewPastDataActivity.this,
+                            android.R.layout.simple_list_item_1, nutritionStrings));
+
+                    //process exercise
+                    List<String> exerciseStrings = new ArrayList<>();
+                    for (ExerciseEntry entry : data.getExercise())
+                    {
+                        exerciseStrings.add(formatDate(entry.getRecorded_at()) + " - " + entry.getExercise_type() +
+                                " - " + entry.getSets() + "x" + entry.getReps() + " at " + entry.getWeight() + " lbs");
+                    }
+                    workoutList.setAdapter(new ArrayAdapter<>(ViewPastDataActivity.this,
+                            android.R.layout.simple_list_item_1, exerciseStrings));
+                }
+            }
+            @Override
+            public void onFailure(retrofit2.Call<AllHistoryResponse> call, Throwable t)
+            {
+                Log.e("NETWORK_ERROR", "Failed to fetch history", t);
+                Toast.makeText(ViewPastDataActivity.this, "Network Error: " + t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+        });
     }
 
     private String formatDate(String rawTime)
     {
         try {
-            SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
             dbFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
 
-            SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd");
+            SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd", Locale.US);
 
             Date date = dbFormat.parse(rawTime);
             return displayFormat.format(date);
         }catch (Exception e) {
-            return rawTime.split("T")[0];
+            return rawTime.contains("T") ? rawTime.split("T")[0] : rawTime;
         }
     }
 }

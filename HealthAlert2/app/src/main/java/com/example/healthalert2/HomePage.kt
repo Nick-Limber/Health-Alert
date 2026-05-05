@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.healthalert2.data.network.AddDietRequest
+import com.example.healthalert2.data.network.ExerciseRequest
 import com.example.healthalert2.data.network.RetrofitClient
 import com.example.healthalert2.data.network.getDietsResponse
 import com.example.healthalert2.databinding.ActivityHomePageBinding
@@ -21,6 +22,9 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
+import com.example.healthalert2.data.network.WeightRequest
+import com.example.healthalert2.data.network.HealthApiService
+
 
 class HomePage : AppCompatActivity() {
 
@@ -34,8 +38,6 @@ class HomePage : AppCompatActivity() {
     private lateinit var binding: ActivityHomePageBinding
     private val dietService = RetrofitClient.dietApiService
 
-    private lateinit var inputDailyWeight: EditText
-
 
     //Exercise inputs
     private lateinit var inputExerciseName: EditText
@@ -47,7 +49,6 @@ class HomePage : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home_page)
         prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
 
         // 1. Initialize the binding FIRST
@@ -62,7 +63,7 @@ class HomePage : AppCompatActivity() {
         inputProtein = findViewById(R.id.inputProtein)
         inputCarbs = findViewById(R.id.inputCarbs)
 
-
+        //inputDailyWeight = findViewById(R.id.btnSaveWeight)
         //added by NNicholas - for exercise
         inputExerciseName = findViewById(R.id.inputExerciseName)
         inputSets = findViewById(R.id.inputSets)
@@ -97,14 +98,17 @@ class HomePage : AppCompatActivity() {
         }
 
         saveWeightBtn.setOnClickListener {
-            val weightValue = inputDailyWeight.text.toString().trim()
-            if (weightValue.isNotEmpty())
-            {
-                performWeightUpdate(weightValue)
+            val weightInput = findViewById<EditText>(R.id.inputWeightNew)
+            val weightText = binding.inputWeightNew.text.toString().trim()
+
+            Log.d("APP_DEBUG", "Button clicked! Value in field: $weightText")
+
+            if (weightText.isNotEmpty()) {
+                performWeightUpdate(weightText)
             }
-            else
-            {
-                Toast.makeText(this, "Enter weight first", Toast.LENGTH_SHORT).show()
+            else {
+                binding.inputWeightNew.error = "Enter weight"
+                Toast.makeText(this, "Please enter your current weight", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -120,7 +124,8 @@ class HomePage : AppCompatActivity() {
             }
             else
             {
-                Toast.makeText(this, "Please fill in all exercise fields", Toast.LENGTH_SHORT).show()
+                val debugMsg = "Empty: N:${exercise_name.isEmpty()} S:${sets.isEmpty()} R:${reps.isEmpty()} W:${weightUsed.isEmpty()}"
+                Toast.makeText(this, debugMsg, Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -211,88 +216,73 @@ class HomePage : AppCompatActivity() {
 
     // --- WEIGHT LOGGING (OkHttp) ---
     private fun performWeightUpdate(weight: String) {
-        val url = "https://gleaming-sparkle-production-acb6.up.railway.app/health/log-weight"
-
         val userId = prefs.getInt("user_id", -1)
         val token = prefs.getString("auth_token", "") ?: ""
+        val authHeader = "Bearer $token"
 
-        val jsonPayload = """
-            {
-                "profile_id": $userId,
-                "weight": $weight
-            }
-        """.trimIndent()
 
-        val body = jsonPayload.toRequestBody("application/json; charset=utf-8".toMediaType())
-        val request = Request.Builder()
-            .url(url)
-            .post(body)
-            .addHeader("Authorization", "Bearer $token")
-            .build()
+        lifecycleScope.launch{
+            try {
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call : Call, e: IOException) {
-                runOnUiThread { Toast.makeText(this@HomePage, "Network Error", Toast.LENGTH_SHORT).show() }
-            }
+                val request = WeightRequest(
+                    profile_id = userId,
+                    weight = weight.toDoubleOrNull()?.toInt() ?: 0
+                )
 
-            override fun onResponse(call: Call, response: Response) {
-                runOnUiThread {
-                    if (response.isSuccessful)
-                    {
-                        Toast.makeText(this@HomePage, "Weight Saved!", Toast.LENGTH_SHORT).show()
-                        binding.inputWeightNew.text.clear()
-                    }
+                val response = RetrofitClient.healthApiService.logWeight(authHeader, request)
+
+                if (response.isSuccessful)
+                {
+                    Toast.makeText(this@HomePage, "Weight Saved!", Toast.LENGTH_LONG).show()
+                    findViewById<EditText>(R.id.inputWeightNew).text.clear()
+                }
+                else
+                {
+                    val errorBody = response.errorBody()?.string() ?: "Unkown Error"
+                    Toast.makeText(this@HomePage, "Error: $errorBody", Toast.LENGTH_LONG).show()
                 }
             }
-        })
+            catch (e: Exception)
+            {
+                Toast.makeText(this@HomePage, "Failure: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun saveExerciseToDatabase(exercise_name: String, sets: String, reps: String, weightUsed: String)
     {
-        val url = "https://gleaming-sparkle-production-acb6.up.railway.app/health/log-exercise"
-        val userId = prefs.getInt("current_user_id:", -1)
+        val userId = prefs.getInt("user_id", -1)
         val token = prefs.getString("auth_token", "") ?: ""
+        val authHeader = "Bearer $token"
 
-        val jsonPayload = """
-            {
-                "profile_id": $userId,
-                "exercise_type": "$exercise_name",
-                "sets": $sets,
-                "reps": $reps,
-                "weight": $weightUsed
-            }
-        """.trimIndent()
+        lifecycleScope.launch{
+            try {
+                val request = ExerciseRequest (
+                    profile_id = userId,
+                    exercise_type = exercise_name,
+                    sets = sets.toIntOrNull() ?: 0,
+                    reps = reps.toIntOrNull() ?: 0,
+                    weight = weightUsed.toIntOrNull() ?: 0
+                )
 
-        val body = jsonPayload.toRequestBody("application/json; charset=utf-8".toMediaType())
-        val request = Request.Builder()
-            .url(url)
-            .post(body)
-            .addHeader("Authorization", "Bearer $token")
-            .build()
+                val response = RetrofitClient.healthApiService.logExercise(authHeader, request)
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: okio.IOException) {
-                runOnUiThread { Toast.makeText(this@HomePage, "Server Error", Toast.LENGTH_SHORT).show() }
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val responseCode = response.code
-                runOnUiThread {
-                    if (response.isSuccessful)
-                    {
-                        Toast.makeText(this@HomePage, "Exercise Saved!", Toast.LENGTH_SHORT).show()
-                        inputExerciseName.text.clear()
-                        inputSets.text.clear()
-                        inputReps.text.clear()
-                        inputExerciseWeight.text.clear()
-                    }
-                    else
-                    {
-                        Log.e("SERVER_ERROR", "Code: $responseCode")
-                        Toast.makeText(this@HomePage, "Failed to save exercise", Toast.LENGTH_SHORT).show()
-                    }
+                if (response.isSuccessful) {
+                    Toast.makeText(this@HomePage, "Exercise Saved!", Toast.LENGTH_LONG).show()
+                    inputExerciseName.text.clear()
+                    inputSets.text.clear()
+                    inputReps.text.clear()
+                    inputExerciseWeight.text.clear()
+                }
+                else {
+                    val errorBody = response.errorBody()?.string() ?: "Unknown Error"
+                    Toast.makeText(this@HomePage, "Error: $errorBody", Toast.LENGTH_LONG).show()
                 }
             }
-        })
+            catch (e: Exception) {
+                Toast.makeText(this@HomePage, "Failure: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            }
+        }
+
     }
 }
