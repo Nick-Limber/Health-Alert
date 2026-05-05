@@ -2,6 +2,7 @@ import express from "express";
 import { db_pool } from "../config/db.js";
 
 const router = express.Router();
+console.log("🚨 HEALTH ROUTES HAVE SUCCESSFULLY LOADED INTO MEMORY 🚨");
 
 router.get("/all-history/:profile_id", async (req, res) => {
     try {
@@ -98,6 +99,43 @@ router.post("/log-weight", async (req, res) => {
         });
     } catch (err) {
         console.log("ERROR IN HEALTH POST ROUTE:");
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            error: "Database error: " + err.message
+        });
+    }
+});
+
+//new route for home page
+router.post("/log-exercise", async (req, res) => {
+    try {
+        const { profile_id, exercise_type, sets, reps, weight } = req.body;
+
+        console.log(`-- NEW EXERCISE LOG REQUEST: Profile ${profile_id}, Exercise: ${exercise_type}, Sets: ${sets}, Reps: ${reps}, Weight: ${weight}`);
+
+        //validation
+        if (!profile_id || !exercise_type || !sets || !reps || weight === undefined) {
+            return res.status(400).json({ 
+                success: false,
+                error: "Missing required fields. Please provide profile_id, exercise_type, sets, reps, and weight."
+            });
+        }
+
+        const query = `
+            INSERT INTO exercise (profile_id, exercise_type, sets, reps, weight, recorded_at)
+            VALUES (?, ?, ?, ?, ?, NOW())
+        `;
+
+        const [result] = await db_pool.query(query, [profile_id, exercise_type, sets, reps, weight]);
+
+        res.status(200).json({
+            success: true,
+            message: "Exercise logged successfully.",
+            id: result.insertId
+        });
+    } catch (err) {
+        console.log("ERROR IN EXERCISE POST ROUTE:");
         console.error(err);
         res.status(500).json({
             success: false,
