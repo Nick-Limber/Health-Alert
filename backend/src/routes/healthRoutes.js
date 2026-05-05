@@ -2,6 +2,7 @@ import express from "express";
 import { db_pool } from "../config/db.js";
 
 const router = express.Router();
+console.log("🚨 HEALTH ROUTES HAVE SUCCESSFULLY LOADED INTO MEMORY 🚨");
 
 router.get("/all-history/:profile_id", async (req, res) => {
     try {
