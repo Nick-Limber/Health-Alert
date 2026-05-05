@@ -362,7 +362,7 @@
                     </LinearLayout>
 
                     <Button
-                        android:id="@+id/btnSaveWeight"
+                        android:id="@+id/btnSaveExercise"
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
