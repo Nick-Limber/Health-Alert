@@ -25,6 +25,9 @@ class CreatePostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_post)
 
+        val sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val currentUserId = sharedPreferences.getInt("profile_id", -1000)
+
         etTitle = findViewById(R.id.etTitle)
         etContent = findViewById(R.id.etContent)
         btnSubmit = findViewById(R.id.btnSubmitPost)
@@ -55,7 +58,7 @@ class CreatePostActivity : AppCompatActivity() {
                     postId = postId,
                     title = title,
                     content = content,
-                    profileID = 0,
+                    profileID = currentUserId,
                     username = "",
                     timestamp = "",
                     replies = emptyList()
@@ -80,7 +83,7 @@ class CreatePostActivity : AppCompatActivity() {
             } else {
                 // CREATE POST
                 val newPost = CreatePostRequest(
-                    userId =1,
+                    profile_id = currentUserId,
                     title = title,
                     content = content
                 )
@@ -105,5 +108,7 @@ class CreatePostActivity : AppCompatActivity() {
                 })
             }
         }
+
     }
+
 }
