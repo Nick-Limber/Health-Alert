@@ -59,12 +59,20 @@ class RegisterPage : AppCompatActivity() {
                         registerRequest(username, email, birthday, pass)
                     )
 
-                    if (response.isSuccessful) { val registerResponse = response.body()
+                    if (response.isSuccessful) {
+                        val registerResponse = response.body()
                         val token = registerResponse?.token
+
+                        val userId = registerResponse?.id
+                            ?: registerResponse?.user_id
+                            ?: registerResponse?.userId
+                            ?: -1
+
                         if (token != null) {
                             Log.d("REGISTER_DEBUG", "Success! Saving token and switching.")
 
                             editor.putString("auth_token", token)
+                            editor.putInt("user_id", userId)
                             editor.apply()
 
                             Toast.makeText(this@RegisterPage, "Login Successful!", Toast.LENGTH_SHORT).show()

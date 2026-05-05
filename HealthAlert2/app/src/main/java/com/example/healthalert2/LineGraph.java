@@ -37,7 +37,7 @@ public class LineGraph extends View {
 
         textPaint = new Paint();
         textPaint.setColor(Color.BLACK);
-        textPaint.setTextSize(25f);
+        textPaint.setTextSize(30f);
 
         datapoints = new ArrayList<>();
         labels = new ArrayList<>();
@@ -66,33 +66,42 @@ public class LineGraph extends View {
         int n = datapoints.size();
 
         //paddinng
-        float paddingTop = 40f;
-        float paddingBottom = 40f;
-        float paddingLeft = 50f;
-        float paddingRight = 50f;
+        float paddingTop = 60f;
+        float paddingBottom = 80f;
+        float paddingLeft = 80f;
+        float paddingRight = 60f;
 
         float graphHeight = height - paddingTop - paddingBottom;
         float graphWidth = width - paddingLeft - paddingRight;
 
         //find min and max for Y
-        float min = Float.MAX_VALUE;
-        float max = Float.MIN_VALUE;
+        float actualMin = Float.MAX_VALUE;
+        float actualMax = Float.MIN_VALUE;
         for (float v : datapoints)
         {
-            if (v > max)
+            if (v > actualMax)
             {
-                max = v;
+                actualMax = v;
             }
-            if (v < min)
+            if (v < actualMin)
             {
-                min = v;
+                actualMin = v;
             }
         }
 
+        float min = actualMin;
+        float max = actualMax;
+
         //buff
-        float buffer = (max - min) * 0.1f;
-        if (buffer == 0)
+        float range = max - min;
+        float buffer = range * 0.15f;
+
+        if (range == 0)
         {
+            max += 10f;
+            min -= 10f;
+        }
+        else {
             max += buffer;
             min -= buffer;
         }
@@ -121,13 +130,13 @@ public class LineGraph extends View {
         for (int i = 0; i < labels.size(); i++)
         {
             float x = paddingLeft + i * gap;
-            float y = height - paddingBottom + 30;
-            canvas.drawText(labels.get(i), x - 30, y, textPaint);
+            float y = height - paddingBottom + 45;
+            canvas.drawText(labels.get(i), x - 40, y, textPaint);
         }
 
         //min&max on Y
-        canvas.drawText(String.valueOf((int) min), 5, height - paddingBottom, textPaint);
-        canvas.drawText(String.valueOf((int) max), 5, paddingTop, textPaint);
+        canvas.drawText(String.valueOf((int) actualMin), 10, height - paddingBottom, textPaint);
+        canvas.drawText(String.valueOf((int) actualMax), 10, paddingTop, textPaint);
     }
 
 

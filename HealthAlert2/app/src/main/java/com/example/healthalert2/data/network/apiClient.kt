@@ -47,4 +47,8 @@ object RetrofitClient {
         retrofit.create(DietApiService::class.java)
     }
 
+    val healthApiService: HealthApiService by lazy {
+        retrofit.create(HealthApiService::class.java)
+    }
+
 }
