@@ -1,5 +1,6 @@
 import express from "express";
 import { db_pool } from "../config/db.js";
+import { verificationMiddleware } from "../middleware/verificationMiddleware.js";
 
 const router = express.Router();
 console.log(" HEALTH ROUTES HAVE SUCCESSFULLY LOADED INTO MEMORY ");
@@ -108,7 +109,7 @@ router.post("/log-weight", async (req, res) => {
 });
 
 //new route for home page
-router.post("/log-exercise", async (req, res) => {
+router.post("/log-exercise", verificationMiddleware,async (req, res) => {
     try {
         const profile_id = req.user; 
         const { exercise_type, sets, reps, weight } = req.body;
