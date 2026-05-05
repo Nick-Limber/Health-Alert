@@ -75,19 +75,15 @@ class LoginPage : AppCompatActivity() {
                     if (response.isSuccessful) { val loginResponse = response.body()
                         val token = loginResponse?.data?.token
                         val username = loginResponse?.data?.user?.username
+                        val profile_id = loginResponse?.data?.user?.id
 
                         if (token != null) {
                             Log.d("LOGIN_DEBUG", "Success! Saving token and switching.")
 
                             editor.putString("auth_token", token)
+                            editor.putString("user_name", username)
+                            editor.putInt("profile_id", profile_id ?: -1)
                             editor.apply()
-
-                            val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
-                            with (prefs.edit()) {
-                                putString("user_name", username)
-                                apply()
-                            }
-
 
                             Toast.makeText(this@LoginPage, "Login Successful!", Toast.LENGTH_SHORT).show()
 

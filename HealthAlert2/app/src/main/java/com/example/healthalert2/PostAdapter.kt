@@ -2,6 +2,7 @@ package com.example.healthalert2
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -173,12 +174,12 @@ class PostAdapter(
             val text = TextView(context).apply {
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                 // Use safe access or fallback to "User" if username is missing
-                val displayUser = if (reply.username.isNullOrEmpty()) "User ${reply.userId}" else reply.username
+                val displayUser = if (reply.username.isNullOrEmpty()) "User ${reply.profile_id}" else reply.username
                 this.text = "↳ $displayUser: ${reply.content}"
                 textSize = 14f
             }
             row.addView(text)
-            if (reply.userId == currentUserId) {
+            if (reply.profile_id == currentUserId) {
                 val deleteBtn = ImageButton(context).apply {
                     setImageResource(android.R.drawable.ic_menu_delete)
                     setBackgroundColor(android.graphics.Color.TRANSPARENT)
@@ -221,7 +222,7 @@ class PostAdapter(
     }
 
     private fun sendReply(postId: Int, userId: Int, content: String, context: Context, holder: PostViewHolder) {
-        RetrofitInstance.api.sendReply(postId, CreateReplyRequest(userId, content)).enqueue(object : Callback<Void> {
+        RetrofitInstance.api.sendReply(postId, CreateReplyRequest(currentUserId, content)).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     Toast.makeText(context, "Reply sent", Toast.LENGTH_SHORT).show()

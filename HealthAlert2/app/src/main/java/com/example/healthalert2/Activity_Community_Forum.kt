@@ -22,8 +22,6 @@ class CommunityForumActivity : AppCompatActivity() {
     private lateinit var postList: MutableList<Post>
     private lateinit var adapter: PostAdapter
 
-    private val currentUserId = 1 // TODO: Replace with real logged-in user ID
-
     private val createPostLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -35,6 +33,9 @@ class CommunityForumActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_community_forum)
+
+        val sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val currentUserId = sharedPreferences.getInt("profile_id", -1000)
 
         recyclerView = findViewById(R.id.recyclerViewPosts)
         btnCreatePost = findViewById(R.id.btnCreatePost)
