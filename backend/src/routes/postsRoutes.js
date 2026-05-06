@@ -55,6 +55,25 @@ router.put("/:id", async (req, res) => {
 
     res.json({ message: "Post updated" });
 });
+
+//delete reply
+router.delete("/:postId/replies/:id", async (req, res) => {
+    const replyId = req.params.id;
+    try {
+        const [result] = await db_pool.query(
+            "DELETE FROM replies WHERE id = ?",
+            [replyId]
+        );
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Reply not found" });
+        }
+        res.json({ message: "Reply deleted" });
+    } catch (error) {
+        console.error("REPLY DELETE ERROR:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // DELETE a post
 router.delete("/:id", async (req, res) => {
     const postId = req.params.id;
@@ -78,10 +97,17 @@ router.delete("/:id", async (req, res) => {
 router.get("/:postId/replies", async (req, res) => {
     try {
         const { postId } = req.params;
-        const [rows] = await db_pool.query(
-            "SELECT * FROM replies WHERE postId = ? ORDER BY timestamp ASC",
-            [postId]
-        );
+
+        const sql = `
+            SELECT r.*, pr.username
+            FROM replies r
+            JOIN profile pr ON r.profile_id = pr.profile_id
+            WHERE r.postId = ?
+            ORDER BY r.timestamp ASC
+        `;
+
+        const [rows] = await db_pool.query(sql, [postId]);
+
         res.json(rows);
     } catch (error) {
         console.error("REPLY GET ERROR:", error);
@@ -95,23 +121,14 @@ router.post("/:postId/replies", async (req, res) => {
         const { postId } = req.params;
         const { profile_id, content } = req.body;
 
-        console.log(profile_id);
-
-
         if (!profile_id || !content) {
             return res.status(400).json({ message: "Missing userId or content" });
         }
-
-        console.log(postId);
-        console.log(profile_id);
-        console.log(content);
 
         const [result] = await db_pool.query(
             "INSERT INTO replies (postId, profile_id, content) VALUES (?, ?, ?)",
             [postId, profile_id, content]
         );
-
-        console.log(result.insertId);
 
         res.status(201).json({ message: "Reply added", replyId: result.insertId });
     } catch (error) {
