@@ -113,12 +113,10 @@ class WorkoutPlanActivity : AppCompatActivity() {
     }
 
 
-    // HELPER FUNCTIONS
     private fun getSavedToken(): String? {
         val sharedPrefs = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
         return sharedPrefs.getString("auth_token", null)
     }
-
     private fun redirectToLogin() {
         Toast.makeText(this, "Please log in again", Toast.LENGTH_LONG).show()
         val intent = Intent(this, LoginPage::class.java)
