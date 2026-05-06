@@ -13,7 +13,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
 //allows users to browse posts
 class CommunityForumActivity : AppCompatActivity() {
 
@@ -21,7 +20,6 @@ class CommunityForumActivity : AppCompatActivity() {
     private lateinit var btnCreatePost: Button
     private lateinit var postList: MutableList<Post>
     private lateinit var adapter: PostAdapter
-
     private val createPostLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->

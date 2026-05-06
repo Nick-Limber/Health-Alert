@@ -34,7 +34,6 @@ class HomePage : AppCompatActivity() {
     private val dietService = RetrofitClient.dietApiService
 
 
-
     private val client = OkHttpClient()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,7 +117,6 @@ class HomePage : AppCompatActivity() {
         super.onResume()
         fetchDietSummary()
     }
-
     private fun fetchDietSummary() {
         lifecycleScope.launch {
             try {
@@ -133,14 +131,12 @@ class HomePage : AppCompatActivity() {
             }
         }
     }
-
     private fun updateUI(data: getDietsResponse) {
         // Update your UI elements safely
         binding.caloriesValue.text = "${data.calories}"
         binding.proteinValue.text = "${data.protein}g"
         binding.carbsValue.text = "${data.carbs}g"
     }
-
     // --- MEAL LOGGING (Retrofit) ---
     private fun saveMealToDatabase(name: String, calories: Int, protein: Int, carbs: Int) {
         val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
@@ -170,7 +166,6 @@ class HomePage : AppCompatActivity() {
             }
         }
     } // This brace was missing in your code!
-
     // --- WEIGHT LOGGING (OkHttp) ---
     private fun showWeightEntryDialoug() {
         val weightInput = EditText(this)

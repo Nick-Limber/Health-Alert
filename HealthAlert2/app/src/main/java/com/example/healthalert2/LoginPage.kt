@@ -104,22 +104,3 @@ class LoginPage : AppCompatActivity() {
             }
         }
 
-
-        // Bottom Navigation setup
-
-        // Window Insets
-        //ViewCompat.setOnApplyWindowInsetsListener(
-        //    findViewById<View>(R.id.main)
-        //) { v, insets ->
-        //    val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        //    v.setPadding(
-        //        systemBars.left,
-        //        systemBars.top,
-        //        systemBars.right,
-        //        systemBars.bottom
-         //   )
-        //    insets
-       // }
-    }}
-// Change to push in order to update server can delete after
-// another change to update server
