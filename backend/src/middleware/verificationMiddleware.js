@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { db_pool } from "../config/db.js";
 
+
 const verificationMiddleware = async (req, res, next) => {
     let token;
 

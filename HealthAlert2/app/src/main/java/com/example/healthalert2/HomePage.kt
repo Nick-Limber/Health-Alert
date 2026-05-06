@@ -11,15 +11,20 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.healthalert2.data.network.AddDietRequest
+import com.example.healthalert2.data.network.ExerciseRequest
 import com.example.healthalert2.data.network.RetrofitClient
 import com.example.healthalert2.data.network.getDietsResponse
 import com.example.healthalert2.databinding.ActivityHomePageBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.appdistribution.gradle.RequestBuilder
 import kotlinx.coroutines.launch
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
+import com.example.healthalert2.data.network.WeightRequest
+import com.example.healthalert2.data.network.HealthApiService
+
 
 class HomePage : AppCompatActivity() {
 
@@ -34,11 +39,16 @@ class HomePage : AppCompatActivity() {
     private val dietService = RetrofitClient.dietApiService
 
 
+    //Exercise inputs
+    private lateinit var inputExerciseName: EditText
+    private lateinit var inputSets: EditText
+    private lateinit var inputReps: EditText
+    private lateinit var inputExerciseWeight: EditText
+
     private val client = OkHttpClient()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home_page)
         prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         fetchDietSummary()
 
@@ -54,8 +64,16 @@ class HomePage : AppCompatActivity() {
         inputProtein = findViewById(R.id.inputProtein)
         inputCarbs = findViewById(R.id.inputCarbs)
 
+        //inputDailyWeight = findViewById(R.id.btnSaveWeight)
+        //added by NNicholas - for exercise
+        inputExerciseName = findViewById(R.id.inputExerciseName)
+        inputSets = findViewById(R.id.inputSets)
+        inputReps = findViewById(R.id.inputReps)
+        inputExerciseWeight = findViewById(R.id.inputExerciseWeight)
+
         val logMealBtn = findViewById<Button>(R.id.logMealBtn)
         val saveWeightBtn = findViewById<Button>(R.id.btnSaveWeight)
+        val btnSaveExercise = findViewById<Button>(R.id.btnSaveExercise)
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
         // Get username to display
@@ -82,7 +100,35 @@ class HomePage : AppCompatActivity() {
         }
 
         saveWeightBtn.setOnClickListener {
-            showWeightEntryDialoug()
+            val weightInput = findViewById<EditText>(R.id.inputWeightNew)
+            val weightText = binding.inputWeightNew.text.toString().trim()
+
+            Log.d("APP_DEBUG", "Button clicked! Value in field: $weightText")
+
+            if (weightText.isNotEmpty()) {
+                performWeightUpdate(weightText)
+            }
+            else {
+                binding.inputWeightNew.error = "Enter weight"
+                Toast.makeText(this, "Please enter your current weight", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnSaveExercise.setOnClickListener {
+            val exercise_name = inputExerciseName.text.toString().trim()
+            val sets = inputSets.text.toString().trim()
+            val reps = inputReps.text.toString().trim()
+            val weightUsed = inputExerciseWeight.text.toString().trim()
+
+            if (exercise_name.isNotEmpty() && sets.isNotEmpty() && reps.isNotEmpty() && weightUsed.isNotEmpty())
+            {
+                saveExerciseToDatabase(exercise_name, sets, reps, weightUsed)
+            }
+            else
+            {
+                val debugMsg = "Empty: N:${exercise_name.isEmpty()} S:${sets.isEmpty()} R:${reps.isEmpty()} W:${weightUsed.isEmpty()}"
+                Toast.makeText(this, debugMsg, Toast.LENGTH_SHORT).show()
+            }
         }
 
         // 3. Navigation
@@ -167,60 +213,74 @@ class HomePage : AppCompatActivity() {
         }
     } // This brace was missing in your code!
     // --- WEIGHT LOGGING (OkHttp) ---
-    private fun showWeightEntryDialoug() {
-        val weightInput = EditText(this)
-        weightInput.hint = "e.g. 180.5"
-        weightInput.inputType = EditorInfo.TYPE_CLASS_NUMBER or EditorInfo.TYPE_NUMBER_FLAG_DECIMAL
+    private fun performWeightUpdate(weight: String) {
+        val userId = prefs.getInt("user_id", -1)
+        val token = prefs.getString("auth_token", "") ?: ""
+        val authHeader = "Bearer $token"
 
-        AlertDialog.Builder(this)
-            .setTitle("Update Your Weight")
-            .setMessage("Enter your current weight below:")
-            .setView(weightInput)
-            .setPositiveButton("Update Now") { _, _ ->
-                val weightValue = weightInput.text.toString()
-                if (weightValue.isNotEmpty()) {
-                    performWeightUpdate(weightValue)
-                } else {
-                    Toast.makeText(this, "Please enter a value", Toast.LENGTH_SHORT).show()
+
+        lifecycleScope.launch{
+            try {
+
+                val request = WeightRequest(
+                    profile_id = userId,
+                    weight = weight.toDoubleOrNull()?.toInt() ?: 0
+                )
+
+                val response = RetrofitClient.healthApiService.logWeight(authHeader, request)
+
+                if (response.isSuccessful)
+                {
+                    Toast.makeText(this@HomePage, "Weight Saved!", Toast.LENGTH_LONG).show()
+                    findViewById<EditText>(R.id.inputWeightNew).text.clear()
+                }
+                else
+                {
+                    val errorBody = response.errorBody()?.string() ?: "Unkown Error"
+                    Toast.makeText(this@HomePage, "Error: $errorBody", Toast.LENGTH_LONG).show()
                 }
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+            catch (e: Exception)
+            {
+                Toast.makeText(this@HomePage, "Failure: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
-    private fun performWeightUpdate(weight: String) {
-        val url = "https://gleaming-sparkle-production-acb6.up.railway.app/health/log-weight"
+    private fun saveExerciseToDatabase(exercise_name: String, sets: String, reps: String, weightUsed: String)
+    {
+        val userId = prefs.getInt("user_id", -1)
+        val token = prefs.getString("auth_token", "") ?: ""
+        val authHeader = "Bearer $token"
 
-        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
-        val userId = prefs.getInt("current_user_id:", 5)
+        lifecycleScope.launch{
+            try {
+                val request = ExerciseRequest (
+                    profile_id = userId,
+                    exercise_type = exercise_name,
+                    sets = sets.toIntOrNull() ?: 0,
+                    reps = reps.toIntOrNull() ?: 0,
+                    weight = weightUsed.toIntOrNull() ?: 0
+                )
 
-        val jsonPayload = """
-            {
-                "profile_id": $userId
-                ,
-                "weight": $weight
-            }
-        """.trimIndent()
+                val response = RetrofitClient.healthApiService.logExercise(authHeader, request)
 
-        val body = jsonPayload.toRequestBody("application/json; charset=utf-8".toMediaType())
-        val request = Request.Builder().url(url).post(body).build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread {
-                    Toast.makeText(this@HomePage, "Network Error", Toast.LENGTH_SHORT).show()
+                if (response.isSuccessful) {
+                    Toast.makeText(this@HomePage, "Exercise Saved!", Toast.LENGTH_LONG).show()
+                    inputExerciseName.text.clear()
+                    inputSets.text.clear()
+                    inputReps.text.clear()
+                    inputExerciseWeight.text.clear()
+                }
+                else {
+                    val errorBody = response.errorBody()?.string() ?: "Unknown Error"
+                    Toast.makeText(this@HomePage, "Error: $errorBody", Toast.LENGTH_LONG).show()
                 }
             }
-
-            override fun onResponse(call: Call, response: Response) {
-                runOnUiThread {
-                    if (response.isSuccessful) {
-                        Toast.makeText(this@HomePage, "Weight synced", Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(this@HomePage, "Failed: ${response.code}", Toast.LENGTH_SHORT).show()
-                    }
-                }
+            catch (e: Exception) {
+                Toast.makeText(this@HomePage, "Failure: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             }
-        })
+        }
+
     }
 }
