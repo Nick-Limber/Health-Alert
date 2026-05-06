@@ -4,6 +4,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -34,7 +35,7 @@ interface PostApi {
         @Path("postId") postId: Int,
         @Body request: CreateReplyRequest
     ): Call<Void>
-    
+
     // To fetch all replies for a specific post
     @GET("posts/{postId}/replies")
     fun getReplies(@Path("postId") postId: Int): Call<List<Reply>>
@@ -42,6 +43,6 @@ interface PostApi {
     @DELETE("posts/{postId}/replies/{id}")
     fun deleteReply(
         @Path("postId") postId: Int,
-        @Path("id") id: Int
+        @Path("id") replyId: Int
     ): Call<Void>
 }

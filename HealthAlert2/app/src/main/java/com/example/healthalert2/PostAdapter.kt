@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -167,6 +168,7 @@ class PostAdapter(
         if (holder.repliesLayout == null) return
         holder.repliesLayout.removeAllViews()
         for (reply in replies) {
+            Log.d("DELETE_CHECK", "reply.user=${reply.profile_id}, current=$currentUserId")
             val row = LinearLayout(context).apply {
                 orientation = LinearLayout.HORIZONTAL
                 setPadding(16, 6, 0, 6)
@@ -174,7 +176,10 @@ class PostAdapter(
             val text = TextView(context).apply {
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                 // Use safe access or fallback to "User" if username is missing
-                val displayUser = if (reply.username.isNullOrEmpty()) "User ${reply.profile_id}" else reply.username
+               // val displayUser = if (reply.username.isNullOrEmpty()) "User ${reply.profile_id}" else reply.username
+                //this.text = "↳ $displayUser: ${reply.content}"
+                val displayUser = reply.username ?: "Unknown"
+
                 this.text = "↳ $displayUser: ${reply.content}"
                 textSize = 14f
             }
@@ -185,10 +190,12 @@ class PostAdapter(
                     setBackgroundColor(android.graphics.Color.TRANSPARENT)
                 }
                 deleteBtn.setOnClickListener {
+                    Log.d("DELETE_REPLY", "Button clicked! postId=$postId replyId=${reply.id}")
                     AlertDialog.Builder(context)
                         .setTitle("Delete Reply")
                         .setMessage("Are you sure?")
                         .setPositiveButton("Yes") { _, _ ->
+                            Log.d("DELETE_REPLY", "Yes pressed, calling deleteReply")
                             deleteReply(postId, reply.id, holder, context)
                         }
                         .setNegativeButton("Cancel", null)
@@ -201,6 +208,9 @@ class PostAdapter(
     }
 
     private fun deleteReply(postId: Int, replyId: Int, holder: PostViewHolder, context: Context) {
+        val token = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+            .getString("auth_token", "") ?: ""
+
         RetrofitInstance.api.deleteReply(postId, replyId).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
@@ -213,6 +223,8 @@ class PostAdapter(
                         }
                         override fun onFailure(call: Call<List<Reply>>, t: Throwable) {}
                     })
+                } else {
+                    Toast.makeText(context, "Failed: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
             }
             override fun onFailure(call: Call<Void>, t: Throwable) {
@@ -221,8 +233,22 @@ class PostAdapter(
         })
     }
 
-    private fun sendReply(postId: Int, userId: Int, content: String, context: Context, holder: PostViewHolder) {
-        RetrofitInstance.api.sendReply(postId, CreateReplyRequest(currentUserId, content)).enqueue(object : Callback<Void> {
+    private fun sendReply(
+        postId: Int,
+        userId: Int,
+        content: String,
+        context: Context,
+        holder: PostViewHolder
+    ) {
+        val prefs = context.getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val username = prefs.getString("user_name", "Unknown") ?: "Unknown"
+
+        RetrofitInstance.api.sendReply(postId, CreateReplyRequest(
+            postId = postId,
+            profile_id = currentUserId,
+            username = username,
+            content = content
+        )).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     Toast.makeText(context, "Reply sent", Toast.LENGTH_SHORT).show()

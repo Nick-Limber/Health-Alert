@@ -35,7 +35,13 @@ data class Reply(
 )
 
 
+//data class CreateReplyRequest(
+  //  val profile_id: Int,
+    //val content: String
+//)
 data class CreateReplyRequest(
+    val postId: Int,
     val profile_id: Int,
+    val username: String,
     val content: String
 )

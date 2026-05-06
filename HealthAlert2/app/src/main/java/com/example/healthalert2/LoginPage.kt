@@ -79,7 +79,7 @@ class LoginPage : AppCompatActivity() {
                         val username = loginResponse?.data?.user?.username
                         val profile_id = loginResponse?.data?.user?.id
 
-                        if (token != null) {
+                        if (token != null && username != null && profile_id != null){
                             Log.d("LOGIN_DEBUG", "Success! Saving token and switching.")
 
                             editor.putString("auth_token", token)

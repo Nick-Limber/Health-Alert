@@ -34,6 +34,8 @@ class CommunityForumActivity : AppCompatActivity() {
 
         val sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val currentUserId = sharedPreferences.getInt("profile_id", -1000)
+//added
+        val currentUsername = sharedPreferences.getString("user_name", "Unknown") ?: "Unknown"
 
         recyclerView = findViewById(R.id.recyclerViewPosts)
         btnCreatePost = findViewById(R.id.btnCreatePost)
