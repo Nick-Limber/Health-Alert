@@ -65,14 +65,16 @@ class LoginPage : AppCompatActivity() {
 
             lifecycleScope.launch {
                 try {
-                    val email = emailInput.text.toString().trim() // Added trim() to avoid accidental spaces
+                    val email =
+                        emailInput.text.toString().trim() // Added trim() to avoid accidental spaces
                     val pass = passwordInput.text.toString()
 
                     val response = RetrofitClient.loginApiService.loginUser(
                         LoginRequest(email, pass)
                     )
 
-                    if (response.isSuccessful) { val loginResponse = response.body()
+                    if (response.isSuccessful) {
+                        val loginResponse = response.body()
                         val token = loginResponse?.data?.token
                         val username = loginResponse?.data?.user?.username
                         val profile_id = loginResponse?.data?.user?.id
@@ -85,7 +87,8 @@ class LoginPage : AppCompatActivity() {
                             editor.putInt("profile_id", profile_id ?: -1)
                             editor.apply()
 
-                            Toast.makeText(this@LoginPage, "Login Successful!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@LoginPage, "Login Successful!", Toast.LENGTH_SHORT)
+                                .show()
 
                             val intent = Intent(this@LoginPage, HomePage::class.java)
                             startActivity(intent)
@@ -95,7 +98,11 @@ class LoginPage : AppCompatActivity() {
                         }
                     } else {
                         Log.e("LOGIN_DEBUG", "Server error code: ${response.code()}")
-                        Toast.makeText(this@LoginPage, "Login Failed: ${response.code()}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this@LoginPage,
+                            "Login Failed: ${response.code()}",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 } catch (t: Throwable) {
                     Log.e("LOGIN_DEBUG", "Network/Parsing Error: ${t.message}")
@@ -103,23 +110,5 @@ class LoginPage : AppCompatActivity() {
                 }
             }
         }
-
-
-        // Bottom Navigation setup
-
-        // Window Insets
-        //ViewCompat.setOnApplyWindowInsetsListener(
-        //    findViewById<View>(R.id.main)
-        //) { v, insets ->
-        //    val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        //    v.setPadding(
-        //        systemBars.left,
-        //        systemBars.top,
-        //        systemBars.right,
-        //        systemBars.bottom
-         //   )
-        //    insets
-       // }
-    }}
-// Change to push in order to update server can delete after
-// another change to update server
+    }
+}
