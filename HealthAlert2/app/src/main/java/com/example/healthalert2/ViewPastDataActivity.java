@@ -126,7 +126,7 @@ public class ViewPastDataActivity extends AppCompatActivity {
                     for (NutritionEntry entry : data.getNutrition())
                     {
                         nutritionStrings.add(formatDate(entry.getRecorded_at()) + " - " + entry.getDiet_name() +
-                                " (" + entry.getCalories() + " cals - " +entry.getProtein() + " g protein - " + entry.getCarbohydrates() + " g carbs");
+                                " (" + entry.getCalories() + " cals - " +entry.getProtein() + " g protein - " + entry.getCarbohydrates() + " g carbs)");
                     }
 
                     nutritionList.setAdapter(new ArrayAdapter<>(ViewPastDataActivity.this,
